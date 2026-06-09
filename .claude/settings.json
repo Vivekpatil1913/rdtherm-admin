@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell($c = Get-NetTCPConnection -LocalPort 4000 -State Listen -ErrorAction SilentlyContinue; if \\($c\\) { $c.OwningProcess | Select-Object -Unique | ForEach-Object { try { Stop-Process -Id $_ -Force } catch {} } }; \"ok\")",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\).on\\('end',\\(\\)=>{const r=JSON.parse\\(d\\);console.log\\('  ',r.success?\\('OK '+r.data.url\\):\\(r.error.code+': '+r.error.message\\)\\)}\\)\")",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\).on\\('end',\\(\\)=>{const r=JSON.parse\\(d\\);const rows=r.data||r.data?.items||r.items||\\(r.data&&r.data.data\\);const arr=Array.isArray\\(rows\\)?rows:\\(r.data&&r.data.items\\)||[];console.log\\(JSON.stringify\\(arr.slice\\(0,5\\).map\\(p=>\\({id:p.id,slug:p.slug,imgs:\\(p.images||[]\\).map\\(i=>i.url\\)}\\)\\),null,1\\)\\)}\\)\")",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\).on\\('end',\\(\\)=>{const r=JSON.parse\\(d\\);console.log\\('  ',r.error?JSON.stringify\\(r.error.details||r.error.message\\):'OK\\(unexpected\\)'\\)}\\)\")",
+      "PowerShell(\"removed features page\")",
+      "Bash(mkdir -p \"prisma/migrations/20260608130000_remove_features\")",
+      "Bash(printf 'DROP TABLE IF EXISTS `features`;\\\\n')",
+      "PowerShell($c = Get-NetTCPConnection -LocalPort 4000 -State Listen -ErrorAction SilentlyContinue; if \\($c\\) { $c.OwningProcess | Select-Object -Unique | ForEach-Object { try { Stop-Process -Id $_ -Force } catch {} } }; \"stopped\")",
+      "Bash(mkdir -p \"prisma/migrations/20260608140000_product_inclusions\")",
+      "Bash(cat)",
+      "Bash(curl -s \"http://localhost:4000/api/public/industries\")",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\).on\\('end',\\(\\)=>{const a=JSON.parse\\(d\\).data;a.forEach\\(x=>console.log\\('  -',x.label,'| key:',x.key,'| cover:',x.cover?x.cover.split\\('/'\\).pop\\(\\):'\\(none\\)'\\)\\)}\\)\")",
+      "Bash(curl -s \"http://localhost:4000/api/public/team\")",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\).on\\('end',\\(\\)=>{const a=JSON.parse\\(d\\).data.filter\\(m=>m.group==='director'\\);a.forEach\\(x=>console.log\\('  -',x.name,'|',x.role,'| photo:',x.photo?x.photo.split\\('/'\\).pop\\(\\):'\\(none\\)'\\)\\)}\\)\")",
+      "Bash(curl -s \"http://localhost:4000/api/public/logos\")",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\).on\\('end',\\(\\)=>{const a=JSON.parse\\(d\\).data.filter\\(l=>l.kind==='client'\\);console.log\\('  count:',a.length\\); a.slice\\(0,20\\).forEach\\(x=>console.log\\('   -',x.name,'| img:',x.imageUrl?'yes':'NO'\\)\\)}\\)\")",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\).on\\('end',\\(\\)=>{JSON.parse\\(d\\).data.forEach\\(x=>console.log\\('  -',x.label+':',x.description.slice\\(0,55\\)+'…'\\)\\)}\\)\")",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\).on\\('end',\\(\\)=>{JSON.parse\\(d\\).data.filter\\(m=>m.group==='director'\\).forEach\\(x=>console.log\\('  -',x.name,'|',x.role\\)\\)}\\)\")",
+      "PowerShell($c = Get-NetTCPConnection -LocalPort 4000 -State Listen -ErrorAction SilentlyContinue; if \\($c\\) { $c.OwningProcess | Select-Object -Unique | ForEach-Object { try { Stop-Process -Id $_ -Force; \"killed PID $_\" } catch {} } } else { \"no listener on 4000\" })",
+      "Bash(node -e ' *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" --max-time 3 http://localhost:4000/api/public/products)",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\).on\\('end',\\(\\)=>{const r=JSON.parse\\(d\\);const a=r.data.items||r.data;console.log\\('  ',\\(a||[]\\).map\\(p=>p.title\\)\\)}\\)\")",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\).on\\('end',\\(\\)=>{const x=JSON.parse\\(d\\).data;console.log\\(' items:',x.items.length,'| total:',x.total,'| page:',x.page,'| pageSize:',x.pageSize,'| totalPages:',x.totalPages\\)}\\)\")"
+    ]
+  }
+}
