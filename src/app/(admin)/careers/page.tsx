@@ -52,14 +52,14 @@ export default function CareersPage() {
       searchPlaceholder="Search positions…"
       extraFilter={{ key: "department", options: DEPARTMENTS.map((d) => ({ value: d, label: d })) }}
       emptyValues={{ title: "", department: "Engineering", location: "Nashik, India", type: "Full-time", description: "" }}
-      schema={{ title: [rules.required(), rules.minLength(4), rules.maxLength(50)], description: [rules.required(), rules.minLength(15), rules.maxLength(200)], location: [rules.required("Location is required"), rules.maxLength(100)] }}
+      schema={{ title: [rules.required("Please enter the job title"), rules.minLength(4), rules.maxLength(50)], description: [rules.required("Please enter the description"), rules.minLength(15), rules.maxLength(200)], location: [rules.required("Please enter the location"), rules.maxLength(100)] }}
       toForm={(row) => ({ title: row.title, department: row.department, location: row.location, type: row.type, description: row.description })}
       fromForm={(v) => ({ ...v, isActive: true, order: 0, createdAt: "", updatedAt: "" })}
       empty={{ icon: BriefcaseBusiness, title: "No open positions", description: "Post your first job opening." }}
       renderForm={({ values, errors, setValue }) => (
         <>
-          <Field label="Job title" error={errors.title} required>
-            <Input value={values.title} onChange={(e) => setValue("title", e.target.value)} invalid={!!errors.title} maxLength={50} showCount placeholder="Senior Mechanical Design Engineer" />
+          <Field label="Job title" error={errors.title} required count={values.title.length} max={50}>
+            <Input value={values.title} onChange={(e) => setValue("title", e.target.value)} invalid={!!errors.title} maxLength={50} placeholder="Senior Mechanical Design Engineer" />
           </Field>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <Field label="Department">
@@ -72,8 +72,8 @@ export default function CareersPage() {
               <Select value={values.type} onChange={(e) => setValue("type", e.target.value)} options={TYPES.map((t) => ({ value: t, label: t }))} />
             </Field>
           </div>
-          <Field label="Description" error={errors.description} required>
-            <Textarea value={values.description} onChange={(e) => setValue("description", e.target.value)} invalid={!!errors.description} rows={4} maxLength={200} showCount />
+          <Field label="Description" error={errors.description} required count={values.description.length} max={200}>
+            <Textarea value={values.description} onChange={(e) => setValue("description", e.target.value)} invalid={!!errors.description} rows={4} maxLength={200} />
           </Field>
         </>
       )}

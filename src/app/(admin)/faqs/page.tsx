@@ -41,8 +41,8 @@ export default function FaqsPage() {
       searchPlaceholder="Search questions…"
       emptyValues={{ question: "", answer: "" }}
       schema={{
-        question: [rules.required(), rules.minLength(8), rules.maxLength(100)],
-        answer: [rules.required(), rules.minLength(15), rules.maxLength(250)],
+        question: [rules.required("Please enter the question"), rules.minLength(8), rules.maxLength(100)],
+        answer: [rules.required("Please enter the answer"), rules.minLength(15), rules.maxLength(250)],
       }}
       toForm={(row) => ({ question: row.question, answer: row.answer })}
       fromForm={(v) => ({ ...v, isActive: true, order: 0, createdAt: "", updatedAt: "" })}
@@ -50,11 +50,11 @@ export default function FaqsPage() {
       modalSize="md"
       renderForm={({ values, errors, setValue }) => (
         <>
-          <Field label="Question" error={errors.question} required>
-            <Input value={values.question} onChange={(e) => setValue("question", e.target.value)} invalid={!!errors.question} maxLength={100} showCount placeholder="What sizes can R&D Therm fabricate?" />
+          <Field label="Question" error={errors.question} required count={values.question.length} max={100}>
+            <Input value={values.question} onChange={(e) => setValue("question", e.target.value)} invalid={!!errors.question} maxLength={100} placeholder="What sizes can R&D Therm fabricate?" />
           </Field>
-          <Field label="Answer" error={errors.answer} required>
-            <Textarea value={values.answer} onChange={(e) => setValue("answer", e.target.value)} invalid={!!errors.answer} rows={5} maxLength={250} showCount />
+          <Field label="Answer" error={errors.answer} required count={values.answer.length} max={250}>
+            <Textarea value={values.answer} onChange={(e) => setValue("answer", e.target.value)} invalid={!!errors.answer} rows={5} maxLength={250} />
           </Field>
         </>
       )}

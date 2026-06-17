@@ -59,11 +59,11 @@ export function BlogEditor({ post }: BlogEditorProps) {
       date: post?.date ?? new Date().toISOString().slice(0, 10),
     },
     schema: {
-      title: [rules.required("A title is required"), rules.minLength(6), rules.maxLength(50)],
-      excerpt: [rules.required("Add a short excerpt"), rules.maxLength(150)],
-      content: [requiredHtml("Add the article content")],
-      author: [rules.required("Author is required"), rules.maxLength(50)],
-      cover: [rules.required("A cover image is required")],
+      title: [rules.required("Please enter the title"), rules.minLength(6), rules.maxLength(50)],
+      excerpt: [rules.required("Please enter the excerpt"), rules.maxLength(150)],
+      content: [requiredHtml("Please enter the content")],
+      author: [rules.required("Please enter the author"), rules.maxLength(50)],
+      cover: [rules.required("Please upload a cover image")],
     },
     onSubmit: async (values) => {
       const payload = {
@@ -111,18 +111,17 @@ export function BlogEditor({ post }: BlogEditorProps) {
         {/* Main column */}
         <div className="flex flex-col gap-5">
           <Card padded className="flex flex-col gap-4">
-            <Field label="Title" error={form.touched.title ? form.errors.title : ""} required>
+            <Field label="Title" error={form.touched.title ? form.errors.title : ""} required count={form.values.title.length} max={50}>
               <Input
                 value={form.values.title}
                 onChange={(e) => form.setValue("title", e.target.value)}
                 onBlur={() => form.handleBlur("title")}
                 invalid={!!form.errors.title}
                 maxLength={50}
-                showCount
                 placeholder="How automation is shaping the future of manufacturing"
               />
             </Field>
-            <Field label="Excerpt" error={form.touched.excerpt ? form.errors.excerpt : ""} hint="Shown on cards and meta description." required>
+            <Field label="Excerpt" error={form.touched.excerpt ? form.errors.excerpt : ""} hint="Shown on cards and meta description." required count={form.values.excerpt.length} max={150}>
               <Textarea
                 value={form.values.excerpt}
                 onChange={(e) => form.setValue("excerpt", e.target.value)}
@@ -130,7 +129,6 @@ export function BlogEditor({ post }: BlogEditorProps) {
                 invalid={!!form.errors.excerpt}
                 rows={2}
                 maxLength={150}
-                showCount
               />
             </Field>
           </Card>
@@ -176,7 +174,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
               </CardTitle>
             </CardHeader>
             <CardBody>
-              <ImageUpload value={form.values.cover} onChange={(url) => form.setValue("cover", url)} aspect="video" preset={IMAGE_PRESETS.blogCover} />
+              <ImageUpload value={form.values.cover} onChange={(url) => form.setValue("cover", url)} aspect="wide" preset={IMAGE_PRESETS.blogCover} />
               {form.touched.cover && form.errors.cover ? (
                 <p className="mt-2 text-xs text-[var(--color-danger)]">{form.errors.cover}</p>
               ) : null}

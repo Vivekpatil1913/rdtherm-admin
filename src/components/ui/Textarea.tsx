@@ -5,15 +5,13 @@ import { cn } from "@/lib/cn";
 
 export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   invalid?: boolean;
-  /** Show a live "n/max" counter below the field (requires maxLength). */
-  showCount?: boolean;
 }
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function Textarea(
-  { className, invalid, rows = 4, showCount, maxLength, value, ...props },
+  { className, invalid, rows = 4, maxLength, value, ...props },
   ref,
 ) {
-  const textarea = (
+  return (
     <textarea
       ref={ref}
       rows={rows}
@@ -28,22 +26,5 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
       )}
       {...props}
     />
-  );
-
-  if (!showCount || !maxLength) return textarea;
-
-  const len = String(value ?? "").length;
-  return (
-    <div>
-      {textarea}
-      <div
-        className={cn(
-          "mt-1 text-right text-[11px] font-medium tabular-nums",
-          len >= maxLength ? "text-[var(--color-danger)]" : "text-[var(--color-muted)]",
-        )}
-      >
-        {len}/{maxLength}
-      </div>
-    </div>
   );
 });

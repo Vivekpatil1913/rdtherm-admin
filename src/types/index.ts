@@ -166,6 +166,32 @@ export interface Lead extends BaseRecord {
   message: string;
   source: string;
   leadStatus: LeadStatus;
+  feedback?: string;
+}
+
+/* --------------------------- Quote Requests ---------------------------- */
+
+export type QuoteStatus = "new" | "in-progress" | "quoted" | "closed";
+
+/** A single label/value row of an attached product configuration. */
+export interface QuoteConfigLine {
+  label: string;
+  value: string;
+}
+
+export interface QuoteRequest extends BaseRecord {
+  name: string;
+  email: string;
+  mobile: string;
+  company: string;
+  country: string;
+  city: string;
+  message: string;
+  productName: string;
+  quoteType: "standard" | "custom";
+  configuration: QuoteConfigLine[];
+  source: string;
+  quoteStatus: QuoteStatus;
 }
 
 /* ------------------------------- SEO ----------------------------------- */
@@ -214,7 +240,7 @@ export interface SiteSettings {
   address: string;
   phone: string;
   email: string;
-  social: { label: string; href: string }[];
+  social: { label: string; href: string; active?: boolean }[];
   hours: { label: string; value: string }[];
 }
 

@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { Inbox, Mail, Phone, Building2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Inbox, Mail, Phone, Building2, MessageSquareText } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { Tabs } from "@/components/ui/Tabs";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Select } from "@/components/ui/Select";
+import { Textarea } from "@/components/ui/Textarea";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { LeadStatusBadge } from "@/components/ui/StatusBadge";
 import { Pagination } from "@/components/ui/Pagination";
@@ -18,8 +19,13 @@ import { useResource } from "@/hooks/useResource";
 import { useCrud } from "@/hooks/useCrud";
 import { leadService } from "@/services";
 import { useToast } from "@/providers/ToastProvider";
+import { errorMessage } from "@/services/apiError";
 import { formatRelative, truncate } from "@/lib/format";
 import type { Lead, LeadStatus } from "@/types";
+
+// Forward-only pipeline order.
+const STAGES: LeadStatus[] = ["new", "in-progress", "qualified", "closed"];
+const FEEDBACK_LIMIT = 150;
 
 const TABS = [
   { value: "all", label: "All" },
@@ -42,15 +48,46 @@ export default function LeadsPage() {
   const toast = useToast();
   const [viewing, setViewing] = useState<Lead | null>(null);
   const [deleting, setDeleting] = useState<Lead | null>(null);
+  // Close flow: selecting "Closed" reveals a required feedback box before saving.
+  const [draftStatus, setDraftStatus] = useState<LeadStatus | null>(null);
+  const [feedback, setFeedback] = useState("");
+  const [savingStatus, setSavingStatus] = useState(false);
+
+  // Reset the close-draft whenever a different lead is opened/closed.
+  useEffect(() => {
+    setDraftStatus(null);
+    setFeedback("");
+  }, [viewing?.id]);
 
   // The "status" tab maps to the lead-specific status field.
   const leadStatusFilter = resource.status;
 
-  const updateStatus = async (lead: Lead, leadStatus: LeadStatus) => {
-    await leadService.update(lead.id, { leadStatus });
-    setViewing((v) => (v ? { ...v, leadStatus } : v));
-    toast.success("Lead updated", `Marked as ${leadStatus.replace("-", " ")}.`);
-    resource.refetch();
+  // Forward-only options: only the current stage and everything after it.
+  const forwardOptions = (current: LeadStatus) =>
+    STAGES.slice(STAGES.indexOf(current)).map((s) => ({
+      value: s,
+      label: STATUS_OPTIONS.find((o) => o.value === s)!.label,
+    }));
+
+  const updateStatus = async (lead: Lead, leadStatus: LeadStatus, feedbackText?: string) => {
+    if (savingStatus) return;
+    setSavingStatus(true);
+    try {
+      const patch =
+        leadStatus === "closed" ? { leadStatus, feedback: feedbackText } : { leadStatus };
+      await leadService.update(lead.id, patch);
+      setViewing((v) =>
+        v ? { ...v, leadStatus, ...(leadStatus === "closed" ? { feedback: feedbackText } : {}) } : v,
+      );
+      toast.success("Lead updated", `Marked as ${leadStatus.replace("-", " ")}.`);
+      setDraftStatus(null);
+      setFeedback("");
+      resource.refetch();
+    } catch (err) {
+      toast.error("Could not update lead", errorMessage(err));
+    } finally {
+      setSavingStatus(false);
+    }
   };
 
   const columns: Column<Lead>[] = [
@@ -145,18 +182,93 @@ export default function LeadsPage() {
                 {viewing.message}
               </div>
             </div>
-            <div className="flex items-center justify-between gap-3 rounded-[var(--radius-field)] border border-[var(--color-border)] p-3.5">
+            {/* Existing close feedback (terminal stage) */}
+            {viewing.leadStatus === "closed" && viewing.feedback ? (
               <div>
-                <p className="text-[13px] font-medium text-[var(--color-content)]">Lead status</p>
-                <p className="text-[12px] text-[var(--color-muted)]">Track this enquiry through your pipeline</p>
+                <p className="mb-1.5 flex items-center gap-1.5 text-[13px] font-medium text-[var(--color-content)]">
+                  <MessageSquareText className="size-4 text-[var(--color-muted)]" /> Closing feedback
+                </p>
+                <div className="rounded-[var(--radius-field)] border border-[var(--color-border)] bg-[var(--color-bg-subtle)] p-4 text-sm leading-relaxed text-[var(--color-content-soft)] whitespace-pre-wrap">
+                  {viewing.feedback}
+                </div>
               </div>
-              <div className="w-40">
-                <Select
-                  value={viewing.leadStatus}
-                  onChange={(e) => updateStatus(viewing, e.target.value as LeadStatus)}
-                  options={STATUS_OPTIONS}
-                />
+            ) : null}
+
+            <div className="rounded-[var(--radius-field)] border border-[var(--color-border)] p-3.5">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-[13px] font-medium text-[var(--color-content)]">Lead status</p>
+                  <p className="text-[12px] text-[var(--color-muted)]">
+                    {viewing.leadStatus === "closed"
+                      ? "This lead is closed — the pipeline stage is final."
+                      : "Status can only move forward through the pipeline."}
+                  </p>
+                </div>
+                <div className="w-40">
+                  <Select
+                    value={draftStatus ?? viewing.leadStatus}
+                    disabled={viewing.leadStatus === "closed" || savingStatus}
+                    onChange={(e) => {
+                      const next = e.target.value as LeadStatus;
+                      if (next === viewing.leadStatus) return;
+                      if (next === "closed") {
+                        setDraftStatus("closed"); // reveal feedback box; persist on confirm
+                      } else {
+                        setDraftStatus(null);
+                        updateStatus(viewing, next);
+                      }
+                    }}
+                    options={forwardOptions(viewing.leadStatus)}
+                  />
+                </div>
               </div>
+
+              {/* Required feedback before closing */}
+              {draftStatus === "closed" && viewing.leadStatus !== "closed" ? (
+                <div className="mt-3.5 border-t border-[var(--color-border)] pt-3.5">
+                  <label className="mb-1.5 block text-[13px] font-medium text-[var(--color-content)]">
+                    Why are you closing this lead? <span className="text-[var(--color-danger)]">*</span>
+                  </label>
+                  <Textarea
+                    value={feedback}
+                    onChange={(e) => setFeedback(e.target.value.slice(0, FEEDBACK_LIMIT))}
+                    maxLength={FEEDBACK_LIMIT}
+                    rows={3}
+                    placeholder="e.g. Order won — ready to proceed / Not a fit — rejected / Duplicate enquiry…"
+                  />
+                  <div className="mt-1 flex items-center justify-end">
+                    <span
+                      className={
+                        "text-[11px] font-medium tabular-nums " +
+                        (feedback.length >= FEEDBACK_LIMIT ? "text-[var(--color-danger)]" : "text-[var(--color-muted)]")
+                      }
+                    >
+                      {feedback.length}/{FEEDBACK_LIMIT}
+                    </span>
+                  </div>
+                  <div className="mt-2 flex justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setDraftStatus(null);
+                        setFeedback("");
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      loading={savingStatus}
+                      disabled={!feedback.trim()}
+                      onClick={() => updateStatus(viewing, "closed", feedback.trim())}
+                    >
+                      Close lead
+                    </Button>
+                  </div>
+                </div>
+              ) : null}
             </div>
           </div>
         ) : null}

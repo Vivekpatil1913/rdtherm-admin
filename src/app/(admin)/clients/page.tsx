@@ -49,8 +49,8 @@ export default function ClientsPage() {
       modalSize="md"
       emptyValues={{ name: "", imageUrl: "" }}
       schema={{
-        name: [rules.required()],
-        imageUrl: [rules.required("A logo image is required")],
+        name: [rules.required("Please enter the client name")],
+        imageUrl: [rules.required("Please upload a logo image")],
       }}
       toForm={(row) => ({ name: row.name, imageUrl: row.imageUrl ?? "" })}
       fromForm={(v) => ({ ...v, kind: "client" as const, isActive: true, order: 0, createdAt: "", updatedAt: "" })}

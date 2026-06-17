@@ -75,10 +75,10 @@ export default function TestimonialsPage() {
       searchPlaceholder="Search by author or quote…"
       emptyValues={{ author: "", role: "", body: "", rating: 5, avatarUrl: "" }}
       schema={{
-        author: [rules.required(), rules.minLength(2), rules.alpha(), rules.maxLength(50)],
-        role: [rules.required(), rules.maxLength(50)],
-        body: [rules.required(), rules.minLength(20), rules.maxLength(300)],
-        avatarUrl: [rules.required("An avatar image is required")],
+        author: [rules.required("Please enter the author name"), rules.minLength(2), rules.alpha(), rules.maxLength(50)],
+        role: [rules.required("Please enter the role / company"), rules.maxLength(50)],
+        body: [rules.required("Please enter the testimonial"), rules.minLength(20), rules.maxLength(300)],
+        avatarUrl: [rules.required("Please upload an avatar")],
       }}
       toForm={(row) => ({
         author: row.author,
@@ -102,15 +102,15 @@ export default function TestimonialsPage() {
       renderForm={({ values, errors, setValue }) => (
         <>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Field label="Author name" error={errors.author} required>
-              <Input value={values.author} onChange={(e) => setValue("author", e.target.value)} invalid={!!errors.author} maxLength={50} showCount placeholder="Emily Carter" />
+            <Field label="Author name" error={errors.author} required count={values.author.length} max={50}>
+              <Input value={values.author} onChange={(e) => setValue("author", e.target.value)} invalid={!!errors.author} maxLength={50} placeholder="Emily Carter" />
             </Field>
-            <Field label="Role / Company" error={errors.role} required>
-              <Input value={values.role} onChange={(e) => setValue("role", e.target.value)} invalid={!!errors.role} maxLength={50} showCount placeholder="Process Engineering Lead" />
+            <Field label="Role / Company" error={errors.role} required count={values.role.length} max={50}>
+              <Input value={values.role} onChange={(e) => setValue("role", e.target.value)} invalid={!!errors.role} maxLength={50} placeholder="Process Engineering Lead" />
             </Field>
           </div>
-          <Field label="Testimonial" error={errors.body} required>
-            <Textarea value={values.body} onChange={(e) => setValue("body", e.target.value)} invalid={!!errors.body} rows={4} maxLength={300} showCount placeholder="What the client said…" />
+          <Field label="Testimonial" error={errors.body} required count={values.body.length} max={300}>
+            <Textarea value={values.body} onChange={(e) => setValue("body", e.target.value)} invalid={!!errors.body} rows={4} maxLength={300} placeholder="What the client said…" />
           </Field>
           <Field label="Rating">
             <Select

@@ -15,7 +15,7 @@ export default function ForgotPasswordPage() {
 
   const form = useForm({
     initialValues: { email: "" },
-    schema: { email: [rules.required("Email is required"), rules.email()] },
+    schema: { email: [rules.required("Please enter your email"), rules.email()] },
     onSubmit: async (values) => {
       try {
         await api.publicPost("/auth/forgot-password", { email: values.email });

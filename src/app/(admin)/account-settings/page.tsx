@@ -7,7 +7,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/form/Field";
-import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useForm } from "@/hooks/useForm";
 import { rules } from "@/lib/validation";
@@ -25,9 +25,9 @@ export default function AccountSettingsPage() {
   const form = useForm({
     initialValues: { currentPassword: "", newPassword: "", confirm: "" },
     schema: {
-      currentPassword: [rules.required("Enter your current password")],
-      newPassword: [rules.required("Enter a new password"), rules.minLength(8)],
-      confirm: [rules.required("Confirm your new password"), rules.match("newPassword", "Passwords do not match")],
+      currentPassword: [rules.required("Please enter your current password")],
+      newPassword: [rules.required("Please enter a new password"), rules.minLength(8)],
+      confirm: [rules.required("Please confirm your new password"), rules.match("newPassword", "Passwords do not match")],
     },
     onSubmit: async (values) => {
       try {
@@ -35,8 +35,10 @@ export default function AccountSettingsPage() {
           currentPassword: values.currentPassword,
           newPassword: values.newPassword,
         });
-        toast.success("Password changed", "Your password has been updated.");
-        form.reset();
+        toast.success("Password updated", "All sessions were signed out — please sign in again.");
+        // Password change revokes every session; force a fresh login.
+        await logout();
+        router.push("/login");
       } catch (err) {
         toast.error("Could not change password", errorMessage(err));
       }
@@ -68,13 +70,13 @@ export default function AccountSettingsPage() {
           <CardBody>
             <form onSubmit={form.handleSubmit} className="flex max-w-md flex-col gap-4">
               <Field label="Current password" error={form.touched.currentPassword ? form.errors.currentPassword : ""} required>
-                <Input type="password" value={form.values.currentPassword} onChange={(e) => form.setValue("currentPassword", e.target.value)} onBlur={() => form.handleBlur("currentPassword")} invalid={!!form.errors.currentPassword} leftIcon={<Lock className="size-4" />} />
+                <PasswordInput value={form.values.currentPassword} onChange={(e) => form.setValue("currentPassword", e.target.value)} onBlur={() => form.handleBlur("currentPassword")} invalid={!!form.errors.currentPassword} leftIcon={<Lock className="size-4" />} />
               </Field>
               <Field label="New password" hint="At least 8 characters." error={form.touched.newPassword ? form.errors.newPassword : ""} required>
-                <Input type="password" value={form.values.newPassword} onChange={(e) => form.setValue("newPassword", e.target.value)} onBlur={() => form.handleBlur("newPassword")} invalid={!!form.errors.newPassword} leftIcon={<Lock className="size-4" />} />
+                <PasswordInput value={form.values.newPassword} onChange={(e) => form.setValue("newPassword", e.target.value)} onBlur={() => form.handleBlur("newPassword")} invalid={!!form.errors.newPassword} leftIcon={<Lock className="size-4" />} />
               </Field>
               <Field label="Confirm new password" error={form.touched.confirm ? form.errors.confirm : ""} required>
-                <Input type="password" value={form.values.confirm} onChange={(e) => form.setValue("confirm", e.target.value)} onBlur={() => form.handleBlur("confirm")} invalid={!!form.errors.confirm} leftIcon={<Lock className="size-4" />} />
+                <PasswordInput value={form.values.confirm} onChange={(e) => form.setValue("confirm", e.target.value)} onBlur={() => form.handleBlur("confirm")} invalid={!!form.errors.confirm} leftIcon={<Lock className="size-4" />} />
               </Field>
               <div>
                 <Button type="submit" loading={form.isSubmitting}>

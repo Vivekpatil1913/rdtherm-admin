@@ -6,11 +6,17 @@ interface FieldProps {
   error?: string;
   hint?: string;
   required?: boolean;
+  /** Current value length — renders a live "count/max" counter in the footer. */
+  count?: number;
+  /** Max length for the counter (and the danger colour once reached). */
+  max?: number;
   className?: string;
   children: React.ReactNode;
 }
 
-export function Field({ label, htmlFor, error, hint, required, className, children }: FieldProps) {
+export function Field({ label, htmlFor, error, hint, required, count, max, className, children }: FieldProps) {
+  const showCount = typeof count === "number" && typeof max === "number";
+  const showFooter = !!error || !!hint || showCount;
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
       {label ? (
@@ -20,10 +26,26 @@ export function Field({ label, htmlFor, error, hint, required, className, childr
         </label>
       ) : null}
       {children}
-      {error ? (
-        <p className="text-xs text-[var(--color-danger)]">{error}</p>
-      ) : hint ? (
-        <p className="text-xs text-[var(--color-muted)]">{hint}</p>
+      {showFooter ? (
+        <div className="flex items-start justify-between gap-3">
+          {error ? (
+            <p className="text-xs text-[var(--color-danger)]">{error}</p>
+          ) : hint ? (
+            <p className="text-xs text-[var(--color-muted)]">{hint}</p>
+          ) : (
+            <span aria-hidden />
+          )}
+          {showCount ? (
+            <span
+              className={cn(
+                "shrink-0 text-[11px] font-medium tabular-nums leading-5",
+                count >= max ? "text-[var(--color-danger)]" : "text-[var(--color-muted)]",
+              )}
+            >
+              {count}/{max}
+            </span>
+          ) : null}
+        </div>
       ) : null}
     </div>
   );

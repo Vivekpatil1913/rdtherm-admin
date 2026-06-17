@@ -58,7 +58,7 @@ export default function TeamPage() {
       searchPlaceholder="Search by name or role…"
       extraFilter={{ key: "group", options: [{ value: "director", label: "Board of Directors" }, { value: "team", label: "Team" }] }}
       emptyValues={{ name: "", role: "", bio: "", photo: "", group: "team" }}
-      schema={{ name: [rules.required(), rules.minLength(2), rules.alpha(), rules.maxLength(50)], role: [rules.required(), rules.maxLength(50)], bio: [rules.required(), rules.minLength(20), rules.maxLength(510)], photo: [rules.required("A photo is required")] }}
+      schema={{ name: [rules.required("Please enter the full name"), rules.minLength(2), rules.alpha(), rules.maxLength(50)], role: [rules.required("Please enter the role / title"), rules.maxLength(50)], bio: [rules.required("Please enter the bio"), rules.minLength(20), rules.maxLength(510)], photo: [rules.required("Please upload a photo")] }}
       toForm={(row) => ({ name: row.name, role: row.role, bio: row.bio, photo: row.photo, group: row.group })}
       fromForm={(v) => ({ ...v, isActive: true, order: 0, createdAt: "", updatedAt: "" })}
       empty={{ icon: Users, title: "No team members yet", description: "Add your first board member or teammate." }}
@@ -69,19 +69,19 @@ export default function TeamPage() {
               <ImageUpload value={values.photo} onChange={(url) => setValue("photo", url)} aspect="square" preset={IMAGE_PRESETS.teamPhoto} />
             </Field>
             <div className="flex flex-col gap-4">
-              <Field label="Full name" error={errors.name} required>
-                <Input value={values.name} onChange={(e) => setValue("name", e.target.value)} invalid={!!errors.name} maxLength={50} showCount placeholder="Rajeev Deshmukh" />
+              <Field label="Full name" error={errors.name} required count={values.name.length} max={50}>
+                <Input value={values.name} onChange={(e) => setValue("name", e.target.value)} invalid={!!errors.name} maxLength={50} placeholder="Rajeev Deshmukh" />
               </Field>
-              <Field label="Role / Title" error={errors.role} required>
-                <Input value={values.role} onChange={(e) => setValue("role", e.target.value)} invalid={!!errors.role} maxLength={50} showCount placeholder="Director — Engineering" />
+              <Field label="Role / Title" error={errors.role} required count={values.role.length} max={50}>
+                <Input value={values.role} onChange={(e) => setValue("role", e.target.value)} invalid={!!errors.role} maxLength={50} placeholder="Director — Engineering" />
               </Field>
               <Field label="Group">
                 <Select value={values.group} onChange={(e) => setValue("group", e.target.value as TeamGroup)} options={[{ value: "director", label: "Board of Directors" }, { value: "team", label: "Team" }]} />
               </Field>
             </div>
           </div>
-          <Field label="Bio" error={errors.bio} required>
-            <Textarea value={values.bio} onChange={(e) => setValue("bio", e.target.value)} invalid={!!errors.bio} rows={4} maxLength={510} showCount />
+          <Field label="Bio" error={errors.bio} required count={values.bio.length} max={510}>
+            <Textarea value={values.bio} onChange={(e) => setValue("bio", e.target.value)} invalid={!!errors.bio} rows={4} maxLength={510} />
           </Field>
         </>
       )}

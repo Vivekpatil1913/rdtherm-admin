@@ -49,7 +49,7 @@ export default function IndustriesPage() {
       columns={columns}
       searchPlaceholder="Search industries…"
       emptyValues={{ label: "", key: "", description: "", cover: "" }}
-      schema={{ label: [rules.required(), rules.maxLength(50)], description: [rules.required(), rules.minLength(20), rules.maxLength(300)], cover: [rules.required("A cover image is required")] }}
+      schema={{ label: [rules.required("Please enter the industry name"), rules.maxLength(50)], description: [rules.required("Please enter the description"), rules.minLength(20), rules.maxLength(300)], cover: [rules.required("Please upload a cover image")] }}
       toForm={(row) => ({ label: row.label, key: row.key, description: row.description, cover: row.cover })}
       fromForm={(v) => ({ ...v, key: v.key || slugify(v.label), isActive: true, order: 0, createdAt: "", updatedAt: "" })}
       empty={{ icon: Factory, title: "No industries yet", description: "Add the first industry sector." }}
@@ -58,16 +58,11 @@ export default function IndustriesPage() {
           <Field label="Cover image" error={errors.cover} required>
             <ImageUpload value={values.cover} onChange={(url) => setValue("cover", url)} aspect="video" preset={IMAGE_PRESETS.industryCover} />
           </Field>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Field label="Industry name" error={errors.label} required>
-              <Input value={values.label} onChange={(e) => setValue("label", e.target.value)} invalid={!!errors.label} maxLength={50} showCount placeholder="Chemical and Petrochemical" />
-            </Field>
-            <Field label="Key (slug)" hint="Auto-generated if left blank">
-              <Input value={values.key} onChange={(e) => setValue("key", e.target.value)} placeholder="chemical" />
-            </Field>
-          </div>
-          <Field label="Description" error={errors.description} required>
-            <Textarea value={values.description} onChange={(e) => setValue("description", e.target.value)} invalid={!!errors.description} rows={3} maxLength={300} showCount />
+          <Field label="Industry name" error={errors.label} required count={values.label.length} max={50}>
+            <Input value={values.label} onChange={(e) => setValue("label", e.target.value)} invalid={!!errors.label} maxLength={50} placeholder="Chemical and Petrochemical" />
+          </Field>
+          <Field label="Description" error={errors.description} required count={values.description.length} max={300}>
+            <Textarea value={values.description} onChange={(e) => setValue("description", e.target.value)} invalid={!!errors.description} rows={3} maxLength={300} />
           </Field>
         </>
       )}

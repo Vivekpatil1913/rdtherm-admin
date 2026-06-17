@@ -30,8 +30,8 @@ export default function ProfilePage() {
       avatar: user?.avatar ?? "",
     },
     schema: {
-      name: [rules.required("Name is required"), rules.minLength(2), rules.alpha(), rules.maxLength(50)],
-      email: [rules.required("Email is required"), rules.email()],
+      name: [rules.required("Please enter your name"), rules.minLength(2), rules.alpha(), rules.maxLength(50)],
+      email: [rules.required("Please enter your email"), rules.email()],
     },
     onSubmit: async (values) => {
       try {

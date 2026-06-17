@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, CheckCircle2, Lock } from "lucide-react";
 import { Field } from "@/components/form/Field";
-import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Button } from "@/components/ui/Button";
 import { useForm } from "@/hooks/useForm";
 import { rules } from "@/lib/validation";
@@ -23,7 +23,7 @@ function ResetForm() {
   const form = useForm({
     initialValues: { password: "", confirm: "" },
     schema: {
-      password: [rules.required("Password is required"), rules.minLength(8)],
+      password: [rules.required("Please enter your password"), rules.minLength(8)],
       confirm: [rules.required("Please confirm your password"), rules.match("password", "Passwords do not match")],
     },
     onSubmit: async (values) => {
@@ -71,10 +71,10 @@ function ResetForm() {
 
       <form onSubmit={form.handleSubmit} className="mt-7 flex flex-col gap-4">
         <Field label="New password" error={form.touched.password ? form.errors.password : ""} required>
-          <Input type="password" value={form.values.password} onChange={(e) => form.setValue("password", e.target.value)} onBlur={() => form.handleBlur("password")} invalid={!!form.errors.password} placeholder="••••••••" leftIcon={<Lock className="size-4" />} />
+          <PasswordInput value={form.values.password} onChange={(e) => form.setValue("password", e.target.value)} onBlur={() => form.handleBlur("password")} invalid={!!form.errors.password} placeholder="••••••••" leftIcon={<Lock className="size-4" />} />
         </Field>
         <Field label="Confirm password" error={form.touched.confirm ? form.errors.confirm : ""} required>
-          <Input type="password" value={form.values.confirm} onChange={(e) => form.setValue("confirm", e.target.value)} onBlur={() => form.handleBlur("confirm")} invalid={!!form.errors.confirm} placeholder="••••••••" leftIcon={<Lock className="size-4" />} />
+          <PasswordInput value={form.values.confirm} onChange={(e) => form.setValue("confirm", e.target.value)} onBlur={() => form.handleBlur("confirm")} invalid={!!form.errors.confirm} placeholder="••••••••" leftIcon={<Lock className="size-4" />} />
         </Field>
         <Button type="submit" size="lg" loading={form.isSubmitting} className="w-full">
           Update password

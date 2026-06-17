@@ -19,6 +19,7 @@ import type {
   Lead,
   Logo,
   Product,
+  QuoteRequest,
   SiteSettings,
   TeamMember,
   Testimonial,
@@ -34,6 +35,7 @@ export const caseStudyService = apiCollection<CaseStudy>("/case-studies");
 export const industryService = apiCollection<Industry>("/industries");
 export const openingService = apiCollection<JobOpening>("/careers");
 export const leadService = apiCollection<Lead>("/leads");
+export const quoteService = apiCollection<QuoteRequest>("/quotes");
 
 /** Site settings (singleton) — not a collection. */
 export const settingsService = {

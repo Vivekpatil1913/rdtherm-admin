@@ -6,15 +6,12 @@ import { cn } from "@/lib/cn";
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   invalid?: boolean;
   leftIcon?: React.ReactNode;
-  /** Show a live "n/max" counter below the field (requires maxLength). */
-  showCount?: boolean;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
-  { className, invalid, leftIcon, showCount, maxLength, value, ...props },
+  { className, invalid, leftIcon, maxLength, value, ...props },
   ref,
 ) {
-  const len = String(value ?? "").length;
   return (
     <div className="relative">
       {leftIcon ? (
@@ -38,16 +35,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         )}
         {...props}
       />
-      {showCount && maxLength ? (
-        <div
-          className={cn(
-            "mt-1 text-right text-[11px] font-medium tabular-nums",
-            len >= maxLength ? "text-[var(--color-danger)]" : "text-[var(--color-muted)]",
-          )}
-        >
-          {len}/{maxLength}
-        </div>
-      ) : null}
     </div>
   );
 });

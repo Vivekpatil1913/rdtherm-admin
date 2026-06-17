@@ -11,6 +11,7 @@ import {
   Factory,
   Boxes,
   Inbox,
+  FileText,
   Settings,
 } from "lucide-react";
 
@@ -62,7 +63,10 @@ export const navGroups: NavGroup[] = [
   },
   {
     title: "Engagement",
-    links: [{ label: "Contact Leads", href: "/leads", icon: Inbox }],
+    links: [
+      { label: "Contact Leads", href: "/leads", icon: Inbox },
+      { label: "Quote Requests", href: "/quotes", icon: FileText },
+    ],
   },
   {
     title: "System",

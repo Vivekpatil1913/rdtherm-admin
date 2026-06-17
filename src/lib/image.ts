@@ -50,8 +50,10 @@ export const IMAGE_PRESETS = {
   productCover: { ratio: { w: 16, h: 9 }, recW: 1600, recH: 900, minW: 800, minH: 450 },
   /** Product gallery — landscape 4:3 lightbox tiles. */
   productGallery: { ratio: { w: 4, h: 3 }, recW: 1200, recH: 900, minW: 800, minH: 600 },
-  /** Blog cover — 16:9 article hero. */
-  blogCover: { ratio: { w: 16, h: 9 }, recW: 1600, recH: 900, minW: 800, minH: 450 },
+  /** Blog cover — 21:9 wide banner on the article detail page. */
+  blogCover: { ratio: { w: 21, h: 9 }, recW: 1680, recH: 720, minW: 1260, minH: 540 },
+  /** Case study cover — 21:9 wide banner on the detail page. */
+  caseStudyCover: { ratio: { w: 21, h: 9 }, recW: 1680, recH: 720, minW: 1260, minH: 540 },
   /** Industry cover — 5:4 section image. */
   industryCover: { ratio: { w: 5, h: 4 }, recW: 1000, recH: 800, minW: 600, minH: 480 },
   /** Team / director photo — 4:5 portrait. */

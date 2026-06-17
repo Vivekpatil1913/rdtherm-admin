@@ -69,17 +69,17 @@ export function ProductEditor({ product }: ProductEditorProps) {
       featured: product?.featured ?? false,
     },
     schema: {
-      title: [rules.required("Product name is required"), rules.maxLength(50)],
-      summary: [rules.required("Add a summary"), rules.minLength(20), rules.maxLength(300)],
-      specs: [rules.required("Add at least one key spec")],
-      content: [requiredHtml("Add the detail content")],
-      applications: [rules.required("Add at least one application")],
-      materials: [rules.required("Add at least one material")],
-      compliance: [rules.required("Add at least one compliance code")],
-      benefits: [rules.required("Add at least one benefit")],
-      inclusions: [rules.required("Add at least one inclusion")],
-      cover: [rules.required("A cover image is required")],
-      images: [rules.required("Add at least one gallery image")],
+      title: [rules.required("Please enter the product name"), rules.maxLength(50)],
+      summary: [rules.required("Please enter the summary"), rules.minLength(20), rules.maxLength(300)],
+      specs: [rules.required("Please add at least one key spec")],
+      content: [requiredHtml("Please enter the detail content")],
+      applications: [rules.required("Please add at least one application")],
+      materials: [rules.required("Please add at least one material")],
+      compliance: [rules.required("Please add at least one compliance code")],
+      benefits: [rules.required("Please add at least one benefit")],
+      inclusions: [rules.required("Please add at least one inclusion")],
+      cover: [rules.required("Please upload a cover image")],
+      images: [rules.required("Please add gallery images")],
     },
     onSubmit: async (values) => {
       const payload = {
@@ -124,11 +124,11 @@ export function ProductEditor({ product }: ProductEditorProps) {
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
         <div className="flex flex-col gap-5">
           <Card padded className="flex flex-col gap-4">
-            <Field label="Product name" error={form.touched.title ? form.errors.title : ""} required>
-              <Input value={form.values.title} onChange={(e) => form.setValue("title", e.target.value)} onBlur={() => form.handleBlur("title")} invalid={!!form.errors.title} maxLength={50} showCount placeholder="Distillation Columns" />
+            <Field label="Product name" error={form.touched.title ? form.errors.title : ""} required count={form.values.title.length} max={50}>
+              <Input value={form.values.title} onChange={(e) => form.setValue("title", e.target.value)} onBlur={() => form.handleBlur("title")} invalid={!!form.errors.title} maxLength={50} placeholder="Distillation Columns" />
             </Field>
-            <Field label="Summary" error={form.touched.summary ? form.errors.summary : ""} hint="Shown on the product card and list." required>
-              <Textarea value={form.values.summary} onChange={(e) => form.setValue("summary", e.target.value)} onBlur={() => form.handleBlur("summary")} invalid={!!form.errors.summary} rows={3} maxLength={300} showCount />
+            <Field label="Summary" error={form.touched.summary ? form.errors.summary : ""} hint="Shown on the product card and list." required count={form.values.summary.length} max={300}>
+              <Textarea value={form.values.summary} onChange={(e) => form.setValue("summary", e.target.value)} onBlur={() => form.handleBlur("summary")} invalid={!!form.errors.summary} rows={3} maxLength={300} />
             </Field>
             <Field label="Key specs" hint="3 short bullet specs shown on the card." error={form.touched.specs ? form.errors.specs : ""} required>
               <TagInput value={form.values.specs} onChange={(v) => form.setValue("specs", v)} placeholder="Shell diameter up to 4,500 mm" />

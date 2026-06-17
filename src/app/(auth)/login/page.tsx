@@ -24,8 +24,8 @@ export default function LoginPage() {
   const form = useForm({
     initialValues: { email: "admin@rdtherm.com", password: "Admin@1234" },
     schema: {
-      email: [rules.required("Email is required"), rules.email()],
-      password: [rules.required("Password is required"), rules.minLength(6)],
+      email: [rules.required("Please enter your email"), rules.email()],
+      password: [rules.required("Please enter your password"), rules.minLength(6)],
     },
     onSubmit: async (values) => {
       try {
