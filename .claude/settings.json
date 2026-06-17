@@ -61,7 +61,9 @@
       "Bash(curl -s -X POST http://localhost:4000/api/auth/forgot-password -H \"Content-Type: application/json\" -d '{\"email\":\"admin@rdtherm.com\"}' -w \"\\\\nHTTP %{http_code}\\\\n\")",
       "Bash(node -e 'const{PrismaClient}=require\\('\\\\''@prisma/client'\\\\''\\);const p=new PrismaClient\\(\\);p.passwordReset.findFirst\\({orderBy:{id:'\\\\''desc'\\\\''}}\\).then\\(r=>{if\\(!r\\){console.log\\('\\\\''none'\\\\''\\);return p.$disconnect\\(\\);}const mins=Math.round\\(\\(new Date\\(r.expiresAt\\)-new Date\\(r.createdAt\\)\\)/60000\\);console.log\\('\\\\''created:'\\\\'',r.createdAt.toISOString\\(\\),'\\\\''| expires in ~'\\\\''+mins+'\\\\'' min | used:'\\\\'',r.usedAt\\);return p.$disconnect\\(\\);}\\);')",
       "Bash(curl -s -m 4 http://localhost:4000/api/public/settings -o /dev/null -w \"server HTTP %{http_code}\\\\n\")",
-      "PowerShell(npx tsc --noEmit; \"EXIT=$LASTEXITCODE\")"
+      "PowerShell(npx tsc --noEmit; \"EXIT=$LASTEXITCODE\")",
+      "Bash(node -e \"const c=require\\('crypto'\\);console.log\\('ACCESS='+c.randomBytes\\(48\\).toString\\('hex'\\)\\);console.log\\('REFRESH='+c.randomBytes\\(48\\).toString\\('hex'\\)\\);\")",
+      "Bash(curl -s -X POST http://127.0.0.1:4000/api/auth/verify-reset-token -H \"Content-Type: application/json\" -d '{\"token\":\"bogus-token-123\"}' -w \"\\\\nHTTP %{http_code}\\\\n\")"
     ]
   }
 }

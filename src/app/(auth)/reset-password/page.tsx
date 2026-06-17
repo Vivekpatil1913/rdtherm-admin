@@ -1,9 +1,9 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, CheckCircle2, Lock } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Lock, Loader2, CircleAlert } from "lucide-react";
 import { Field } from "@/components/form/Field";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Button } from "@/components/ui/Button";
@@ -19,6 +19,22 @@ function ResetForm() {
   const toast = useToast();
   const token = params.get("token") || "";
   const [done, setDone] = useState(false);
+  // Validate the link on load so an expired/used token shows the error immediately.
+  const [tokenStatus, setTokenStatus] = useState<"checking" | "valid" | "invalid">(
+    token ? "checking" : "invalid",
+  );
+
+  useEffect(() => {
+    if (!token) return;
+    let cancelled = false;
+    api
+      .publicPost<{ valid: boolean }>("/auth/verify-reset-token", { token })
+      .then((res) => !cancelled && setTokenStatus(res?.valid ? "valid" : "invalid"))
+      .catch(() => !cancelled && setTokenStatus("invalid"));
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
 
   const form = useForm({
     initialValues: { password: "", confirm: "" },
@@ -37,12 +53,27 @@ function ResetForm() {
     },
   });
 
-  if (!token) {
+  if (tokenStatus === "checking") {
+    return (
+      <div className="py-8 text-center">
+        <Loader2 className="mx-auto size-7 animate-spin text-[var(--color-muted)]" />
+        <p className="mt-3 text-sm text-[var(--color-muted)]">Checking your reset link…</p>
+      </div>
+    );
+  }
+
+  if (tokenStatus === "invalid") {
     return (
       <div className="text-center">
-        <h1 className="text-2xl font-bold tracking-tight text-[var(--color-content)]">Invalid link</h1>
-        <p className="mt-2 text-sm text-[var(--color-muted)]">This reset link is missing its token.</p>
-        <Button href="/forgot-password" variant="outline" className="mt-6 w-full">
+        <div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-2xl bg-[var(--color-danger-soft)] text-[var(--color-danger)]">
+          <CircleAlert className="size-7" />
+        </div>
+        <h1 className="text-2xl font-bold tracking-tight text-[var(--color-content)]">Link expired or invalid</h1>
+        <p className="mt-2 text-sm leading-relaxed text-[var(--color-muted)]">
+          This password reset link has expired (links are valid for 15 minutes) or has already been used. Please request a
+          new one.
+        </p>
+        <Button href="/forgot-password" className="mt-6 w-full">
           Request a new link
         </Button>
       </div>
