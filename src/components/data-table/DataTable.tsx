@@ -74,9 +74,9 @@ export function DataTable<T extends { id: string }>({
     <div className="overflow-x-auto">
       <table className="w-full border-collapse text-sm">
         <thead>
-          <tr className="border-b border-[var(--color-border)] text-center">
+          <tr className="border-b border-[var(--color-border)] text-left">
             {showIndex ? (
-              <th className="w-14 px-5 py-3 text-center text-[12px] font-semibold uppercase tracking-wide text-[var(--color-muted)]">
+              <th className="w-14 px-5 py-3 text-[12px] font-semibold uppercase tracking-wide text-[var(--color-muted)]">
                 Sr No.
               </th>
             ) : null}
@@ -93,7 +93,9 @@ export function DataTable<T extends { id: string }>({
               <th
                 key={col.key}
                 className={cn(
-                  "px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-wide text-[var(--color-muted)]",
+                  "px-4 py-3 text-[12px] font-semibold uppercase tracking-wide text-[var(--color-muted)]",
+                  col.align === "right" && "text-right",
+                  col.align === "center" && "text-center",
                   col.width,
                 )}
               >
@@ -120,7 +122,7 @@ export function DataTable<T extends { id: string }>({
               </th>
             ))}
             {rowActions ? (
-              <th className="w-px whitespace-nowrap px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-wide text-[var(--color-muted)]">
+              <th className="w-px whitespace-nowrap px-4 py-3 text-right text-[12px] font-semibold uppercase tracking-wide text-[var(--color-muted)]">
                 Actions
               </th>
             ) : null}

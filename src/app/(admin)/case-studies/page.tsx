@@ -31,6 +31,7 @@ type FormValues = {
   industry: string;
   summary: string;
   cover: string;
+  cardImage: string;
   content: string;
 }
 
@@ -61,9 +62,9 @@ export default function CaseStudiesPage() {
       collection={caseStudyService}
       columns={columns}
       searchPlaceholder="Search case studies…"
-      emptyValues={{ title: "", client: "", industry: "", summary: "", cover: "", content: "" }}
+      emptyValues={{ title: "", client: "", industry: "", summary: "", cover: "", cardImage: "", content: "" }}
       schema={{ title: [rules.required("Please enter the title"), rules.minLength(6), rules.maxLength(50)], client: [rules.required("Please enter the client"), rules.maxLength(50)], industry: [rules.required("Please enter the industry"), rules.maxLength(50)], summary: [requiredHtml("Please enter the summary")], cover: [rules.required("Please upload a cover image")] }}
-      toForm={(row) => ({ title: row.title, client: row.client, industry: row.industry, summary: row.summary, cover: row.cover, content: row.content })}
+      toForm={(row) => ({ title: row.title, client: row.client, industry: row.industry, summary: row.summary, cover: row.cover, cardImage: row.cardImage ?? "", content: row.content })}
       fromForm={(v) => ({ ...v, slug: slugify(v.title), metrics: [], isActive: true, order: 0, createdAt: "", updatedAt: "" })}
       empty={{ icon: Trophy, title: "No case studies yet", description: "Add your first project success story." }}
       renderForm={({ values, errors, setValue }) => (
@@ -79,8 +80,11 @@ export default function CaseStudiesPage() {
               <Input value={values.industry} onChange={(e) => setValue("industry", e.target.value)} invalid={!!errors.industry} maxLength={50} placeholder="Chemical & Petrochemical" />
             </Field>
           </div>
-          <Field label="Cover image" error={errors.cover} required>
+          <Field label="Cover image" hint="Wide banner shown on the case-study page." error={errors.cover} required>
             <ImageUpload value={values.cover} onChange={(url) => setValue("cover", url)} aspect="wide" preset={IMAGE_PRESETS.caseStudyCover} />
+          </Field>
+          <Field label="Card image" hint="Square thumbnail for the listing grid — falls back to the cover if empty.">
+            <ImageUpload value={values.cardImage} onChange={(url) => setValue("cardImage", url)} aspect="square" preset={IMAGE_PRESETS.blogCard} className="max-w-[220px]" />
           </Field>
           <Field label="Summary" error={errors.summary} required>
             <RichTextEditor

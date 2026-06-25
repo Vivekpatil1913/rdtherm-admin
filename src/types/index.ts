@@ -109,6 +109,7 @@ export interface CaseStudy extends BaseRecord {
   industry: string;
   summary: string;
   cover: string;
+  cardImage?: string;
   metrics: { label: string; value: string }[];
   content: string;
 }

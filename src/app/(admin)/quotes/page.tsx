@@ -7,22 +7,18 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
-import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Pagination } from "@/components/ui/Pagination";
 import { DataTable, type Column } from "@/components/data-table/DataTable";
 import { TableToolbar } from "@/components/data-table/TableToolbar";
 import { RowActionBar } from "@/components/data-table/RowActionBar";
 import { useResource } from "@/hooks/useResource";
-import { useCrud } from "@/hooks/useCrud";
 import { quoteService } from "@/services";
 import { formatRelative } from "@/lib/format";
 import type { QuoteRequest } from "@/types";
 
 export default function QuotesPage() {
   const resource = useResource<QuoteRequest>(quoteService, { initialSort: { sortBy: "createdAt", sortDir: "desc" } });
-  const crud = useCrud(quoteService, "Quote request");
   const [viewing, setViewing] = useState<QuoteRequest | null>(null);
-  const [deleting, setDeleting] = useState<QuoteRequest | null>(null);
 
   // List payloads omit the heavy message/configuration fields, so fetch the
   // full record when opening the detail view.
@@ -89,7 +85,7 @@ export default function QuotesPage() {
           sortDir={resource.sort?.sortDir}
           onSort={resource.toggleSort}
           rowActions={(row) => (
-            <RowActionBar onView={() => openView(row)} onDelete={() => setDeleting(row)} />
+            <RowActionBar onView={() => openView(row)} />
           )}
           empty={{ icon: Inbox, title: "No quote requests yet", description: "New quote requests from the website will appear here." }}
         />
@@ -157,21 +153,6 @@ export default function QuotesPage() {
           </div>
         ) : null}
       </Modal>
-
-      <ConfirmDialog
-        open={!!deleting}
-        onClose={() => setDeleting(null)}
-        onConfirm={async () => {
-          if (deleting) {
-            await crud.remove(deleting.id);
-            setDeleting(null);
-            resource.refetch();
-          }
-        }}
-        title="Delete quote request?"
-        confirmLabel="Delete"
-        loading={crud.busy}
-      />
     </>
   );
 }

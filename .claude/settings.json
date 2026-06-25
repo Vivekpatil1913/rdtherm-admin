@@ -99,7 +99,14 @@
       "Bash(node -e \"let s='';process.stdin.on\\('data',d=>s+=d\\).on\\('end',\\(\\)=>{const j=JSON.parse\\(s\\);console.log\\('keys:',Object.keys\\(j.data.items[0]\\).join\\(','\\)\\);console.log\\('cardImage:',j.data.items[0].cardImage\\);console.log\\('total:',j.data.total\\)}\\)\")",
       "Bash(curl -s --max-time 10 \"https://rdtherm-api.sumagodemo.com/api/public/testimonials\" -o /dev/null -w \"HTTP %{http_code}\\\\n\")",
       "Bash(curl -s --max-time 10 \"https://rdtherm-api.sumagodemo.com/api/public/industries\" -o /dev/null -w \"industries HTTP %{http_code}\\\\n\")",
-      "Bash(curl -s --max-time 10 \"https://rdtherm-api.sumagodemo.com/api/public/logos?kind=client\" -o /dev/null -w \"logos HTTP %{http_code}\\\\n\")"
+      "Bash(curl -s --max-time 10 \"https://rdtherm-api.sumagodemo.com/api/public/logos?kind=client\" -o /dev/null -w \"logos HTTP %{http_code}\\\\n\")",
+      "Bash(grep -rl \"cardImageUrl\" node_modules/.prisma/client/index.d.ts)",
+      "Bash(grep -c \"cardImageUrl\" node_modules/.prisma/client/index.d.ts)",
+      "Bash(node -c src/middleware/errorHandler.js)",
+      "Bash(node -c src/modules/crud.factory.js)",
+      "Bash(grep -rln \"code shop\\\\|Every machine\\\\|fibre laser\\\\|Cutting.*Forming\\\\|Machinery\" src/sections/manufacturing)",
+      "Bash(grep -rln \"Every machine\\\\|code shop\\\\|press brake\" src/)",
+      "PowerShell(Add-Type -AssemblyName System.Drawing; $img = [System.Drawing.Image]::FromFile\\(\"d:\\\\rdtherm-web\\\\public\\\\images\\\\hero\\\\rdtherm-logo.png\"\\); \"Width=$\\($img.Width\\) Height=$\\($img.Height\\)\"; $img.Dispose\\(\\))"
     ]
   }
 }

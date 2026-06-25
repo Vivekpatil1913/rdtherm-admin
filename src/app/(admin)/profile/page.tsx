@@ -15,7 +15,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { useToast } from "@/providers/ToastProvider";
 import { profileService, uploadImage } from "@/services";
 import { errorMessage } from "@/services/apiError";
-import { validateImageFile, IMAGE_PRESETS } from "@/lib/image";
+import { validateImageFile, IMAGE_PRESETS, presetHint } from "@/lib/image";
 
 export default function ProfilePage() {
   const { user, updateUser } = useAuth();
@@ -106,7 +106,7 @@ export default function ProfilePage() {
                 ) : null}
               </div>
               <p className="text-xs text-[var(--color-muted)]">
-                Upload a square image (1:1, recommended 600×600px), JPG, PNG or WEBP, up to 1MB.
+                {presetHint(IMAGE_PRESETS.avatar)} · JPG, PNG or WEBP.
               </p>
             </div>
 

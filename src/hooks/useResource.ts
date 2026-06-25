@@ -26,7 +26,8 @@ export function useResource<T extends { id: string }>(
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState(initialStatus);
   const [filters, setFilters] = useState<Record<string, string | undefined>>(initialFilters);
-  const [sort, setSort] = useState(initialSort);
+  // Default every list to newest-first so freshly added records appear on top.
+  const [sort, setSort] = useState(initialSort ?? { sortBy: "createdAt", sortDir: "desc" as const });
   const [result, setResult] = useState<ListResult<T> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);

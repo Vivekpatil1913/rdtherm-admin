@@ -64,9 +64,9 @@ export const IMAGE_PRESETS = {
   avatar: { ratio: { w: 1, h: 1 }, recW: 600, recH: 600, minW: 300, minH: 300 },
 } as const satisfies Record<string, ImagePreset>;
 
-/** "16:9 · recommended 1600×900px" — used in field hints. */
+/** "16:9 (Recommended: 1600 × 900 px) • Max: 1 MB" — used in field hints. */
 export function presetHint(p: ImagePreset): string {
-  return `${p.ratio.w}:${p.ratio.h} · recommended ${p.recW}×${p.recH}px · max ${IMAGE_RULES.maxMb}MB`;
+  return `${p.ratio.w}:${p.ratio.h} (Recommended: ${p.recW} × ${p.recH} px) • Max: ${IMAGE_RULES.maxMb} MB`;
 }
 
 function readDimensions(file: File): Promise<{ width: number; height: number }> {

@@ -87,38 +87,34 @@ export function ImageUpload({ value, onChange, aspect = "video", className, maxM
     if (file && file.type.startsWith("image/")) readFile(file);
   };
 
-  if (value) {
-    return (
-      <div className={cn("group relative overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-border)]", ASPECT[aspect], className)}>
-        <img src={value} alt="Preview" className="size-full object-cover" />
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/50 p-3 opacity-0 transition-opacity group-hover:opacity-100">
-          <button
-            type="button"
-            onClick={() => inputRef.current?.click()}
-            className="inline-flex w-full max-w-[150px] items-center justify-center gap-1.5 rounded-md bg-white/90 px-3 py-1.5 text-[12.5px] font-medium text-black transition-colors hover:bg-white"
-          >
-            <ImagePlus className="size-4 shrink-0" /> Replace
-          </button>
-          <button
-            type="button"
-            onClick={() => onChange("")}
-            className="inline-flex w-full max-w-[150px] items-center justify-center gap-1.5 rounded-md bg-[var(--color-danger)] px-3 py-1.5 text-[12.5px] font-medium text-white transition-opacity hover:opacity-90"
-          >
-            <Trash2 className="size-4 shrink-0" /> Remove
-          </button>
-        </div>
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={(e) => e.target.files?.[0] && readFile(e.target.files[0])}
-        />
+  const media = value ? (
+    <div className={cn("group relative overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-border)]", ASPECT[aspect], className)}>
+      <img src={value} alt="Preview" className="size-full object-cover" />
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/50 p-3 opacity-0 transition-opacity group-hover:opacity-100">
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          className="inline-flex w-full max-w-[150px] items-center justify-center gap-1.5 rounded-md bg-white/90 px-3 py-1.5 text-[12.5px] font-medium text-black transition-colors hover:bg-white"
+        >
+          <ImagePlus className="size-4 shrink-0" /> Replace
+        </button>
+        <button
+          type="button"
+          onClick={() => onChange("")}
+          className="inline-flex w-full max-w-[150px] items-center justify-center gap-1.5 rounded-md bg-[var(--color-danger)] px-3 py-1.5 text-[12.5px] font-medium text-white transition-opacity hover:opacity-90"
+        >
+          <Trash2 className="size-4 shrink-0" /> Remove
+        </button>
       </div>
-    );
-  }
-
-  return (
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => e.target.files?.[0] && readFile(e.target.files[0])}
+      />
+    </div>
+  ) : (
     <button
       type="button"
       onClick={() => inputRef.current?.click()}
@@ -145,7 +141,6 @@ export function ImageUpload({ value, onChange, aspect = "video", className, maxM
       <p className="text-sm font-medium text-[var(--color-content)]">
         {uploading ? "Uploading…" : "Drop an image, or click to browse"}
       </p>
-      <p className="text-xs text-[var(--color-muted)]">{hint}</p>
       <input
         ref={inputRef}
         type="file"
@@ -154,5 +149,14 @@ export function ImageUpload({ value, onChange, aspect = "video", className, maxM
         onChange={(e) => e.target.files?.[0] && readFile(e.target.files[0])}
       />
     </button>
+  );
+
+  return (
+    <div className="flex flex-col gap-2">
+      {/* Size requirement shown above the field so it stays visible even after
+          an image is uploaded — consistent across every image-upload field. */}
+      {hint ? <p className="text-[12px] leading-snug text-[var(--color-muted)]">{hint}</p> : null}
+      {media}
+    </div>
   );
 }

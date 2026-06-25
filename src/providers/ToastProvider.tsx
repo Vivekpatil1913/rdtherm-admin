@@ -38,6 +38,15 @@ const ACCENT: Record<ToastVariant, string> = {
   info: "text-[var(--color-info)]",
 };
 
+// Variant-colored outline + solid left bar so the toast stays highlighted
+// against the near-black dark-mode background instead of blending in.
+const TONE: Record<ToastVariant, string> = {
+  success: "border-[var(--color-success)]/50 border-l-[var(--color-success)]",
+  error: "border-[var(--color-danger)]/50 border-l-[var(--color-danger)]",
+  warning: "border-[var(--color-warning)]/50 border-l-[var(--color-warning)]",
+  info: "border-[var(--color-info)]/50 border-l-[var(--color-info)]",
+};
+
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const counter = useRef(0);
@@ -78,7 +87,10 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -20, scale: 0.96 }}
                 transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                className="pointer-events-auto flex items-start gap-3 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-elevated)] p-4 shadow-[var(--shadow-pop)]"
+                className={cn(
+                  "pointer-events-auto flex items-start gap-3 rounded-[var(--radius-card)] border border-l-4 bg-[var(--color-elevated)] p-4 shadow-[var(--shadow-pop)]",
+                  TONE[t.variant],
+                )}
               >
                 <Icon className={cn("mt-0.5 size-5 shrink-0", ACCENT[t.variant])} />
                 <div className="min-w-0 flex-1">

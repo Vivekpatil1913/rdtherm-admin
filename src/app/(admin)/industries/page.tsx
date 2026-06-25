@@ -55,14 +55,14 @@ export default function IndustriesPage() {
       empty={{ icon: Factory, title: "No industries yet", description: "Add the first industry sector." }}
       renderForm={({ values, errors, setValue }) => (
         <>
-          <Field label="Cover image" error={errors.cover} required>
-            <ImageUpload value={values.cover} onChange={(url) => setValue("cover", url)} aspect="video" preset={IMAGE_PRESETS.industryCover} />
-          </Field>
           <Field label="Industry name" error={errors.label} required count={values.label.length} max={50}>
             <Input value={values.label} onChange={(e) => setValue("label", e.target.value)} invalid={!!errors.label} maxLength={50} placeholder="Chemical and Petrochemical" />
           </Field>
           <Field label="Description" error={errors.description} required count={values.description.length} max={300}>
             <Textarea value={values.description} onChange={(e) => setValue("description", e.target.value)} invalid={!!errors.description} rows={3} maxLength={300} />
+          </Field>
+          <Field label="Cover image" error={errors.cover} required>
+            <ImageUpload value={values.cover} onChange={(url) => setValue("cover", url)} aspect="video" preset={IMAGE_PRESETS.industryCover} />
           </Field>
         </>
       )}

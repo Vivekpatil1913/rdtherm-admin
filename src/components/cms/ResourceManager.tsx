@@ -84,6 +84,7 @@ export function ResourceManager<T extends { id: string }, V extends Record<strin
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<T | null>(null);
   const [deleting, setDeleting] = useState<T | null>(null);
+  const [viewMode, setViewMode] = useState(false);
 
   const form = useForm<V>({
     initialValues: emptyValues,
@@ -103,12 +104,22 @@ export function ResourceManager<T extends { id: string }, V extends Record<strin
   });
 
   const openCreate = () => {
+    setViewMode(false);
     setEditing(null);
     form.reset(emptyValues);
     setModalOpen(true);
   };
 
   const openEdit = (row: T) => {
+    setViewMode(false);
+    setEditing(row);
+    form.reset(toForm(row));
+    setModalOpen(true);
+  };
+
+  // Read-only modal — same form, but disabled and without a save action.
+  const openView = (row: T) => {
+    setViewMode(true);
     setEditing(row);
     form.reset(toForm(row));
     setModalOpen(true);
@@ -173,7 +184,7 @@ export function ResourceManager<T extends { id: string }, V extends Record<strin
           onSort={resource.toggleSort}
           rowActions={(row) => (
             <RowActionBar
-              onView={() => openEdit(row)}
+              onView={() => openView(row)}
               onEdit={() => openEdit(row)}
               onDelete={() => setDeleting(row)}
               active={(row as { isActive?: boolean }).isActive}
@@ -207,25 +218,41 @@ export function ResourceManager<T extends { id: string }, V extends Record<strin
       <Modal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        title={editing ? `Edit ${singular}` : `Add ${singular}`}
-        description={editing ? "Update the details below." : `Create a new ${singular.toLowerCase()}.`}
+        title={viewMode ? `View ${singular}` : editing ? `Edit ${singular}` : `Add ${singular}`}
+        description={
+          viewMode
+            ? "Read-only details."
+            : editing
+              ? "Update the details below."
+              : `Create a new ${singular.toLowerCase()}.`
+        }
         size={modalSize}
         footer={
-          <>
+          viewMode ? (
             <Button variant="outline" onClick={() => setModalOpen(false)}>
-              Cancel
+              Close
             </Button>
-            <Button onClick={() => form.handleSubmit()} loading={form.isSubmitting}>
-              {editing ? "Save changes" : `Create ${singular}`}
-            </Button>
-          </>
+          ) : (
+            <>
+              <Button variant="outline" onClick={() => setModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={() => form.handleSubmit()} loading={form.isSubmitting}>
+                {editing ? "Save changes" : `Create ${singular}`}
+              </Button>
+            </>
+          )
         }
       >
-        <form
-          onSubmit={form.handleSubmit}
-          className="flex flex-col gap-4"
-        >
-          {renderForm({ values: form.values, errors: form.errors, setValue: form.setValue })}
+        <form onSubmit={form.handleSubmit}>
+          {/* A disabled fieldset makes every control read-only; pointer-events-none
+              also kills hover so image Replace/Remove overlays never appear. */}
+          <fieldset
+            disabled={viewMode}
+            className={`m-0 flex min-w-0 flex-col gap-4 border-0 p-0 ${viewMode ? "pointer-events-none" : ""}`}
+          >
+            {renderForm({ values: form.values, errors: form.errors, setValue: form.setValue })}
+          </fieldset>
         </form>
       </Modal>
 

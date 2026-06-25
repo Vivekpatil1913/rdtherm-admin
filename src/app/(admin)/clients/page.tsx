@@ -18,21 +18,23 @@ type FormValues = {
 
 const columns: Column<Logo>[] = [
   {
+    key: "imageUrl",
+    header: "Logo",
+    render: (row) => (
+      <span className="flex size-16 items-center justify-center overflow-hidden rounded-[12px] border border-[var(--color-border)] bg-white p-2">
+        {row.imageUrl ? (
+          <img src={row.imageUrl} alt={row.name} className="size-full object-contain" />
+        ) : (
+          <span className="text-[11px] font-bold text-[var(--color-muted)]">{row.name}</span>
+        )}
+      </span>
+    ),
+  },
+  {
     key: "name",
     header: "Client",
     sortable: true,
-    render: (row) => (
-      <div className="flex items-center gap-3">
-        <span className="flex h-10 w-16 items-center justify-center overflow-hidden rounded-md border border-[var(--color-border)] bg-[var(--color-bg-subtle)]">
-          {row.imageUrl ? (
-            <img src={row.imageUrl} alt={row.name} className="max-h-7 max-w-14 object-contain" />
-          ) : (
-            <span className="text-[11px] font-bold text-[var(--color-muted)]">{row.name}</span>
-          )}
-        </span>
-        <p className="font-medium text-[var(--color-content)]">{row.name}</p>
-      </div>
-    ),
+    render: (row) => <p className="font-medium text-[var(--color-content)]">{row.name}</p>,
   },
 ];
 
@@ -57,8 +59,13 @@ export default function ClientsPage() {
       empty={{ icon: Building2, title: "No client logos", description: "Add a client logo." }}
       renderForm={({ values, errors, setValue }) => (
         <>
-          <Field label="Logo image" hint="Transparent PNG / SVG works best" error={errors.imageUrl} required>
-            <ImageUpload value={values.imageUrl} onChange={(url) => setValue("imageUrl", url)} aspect="video" className="max-w-xs" />
+          <Field
+            label="Logo image"
+            hint="Square — recommended 400 × 400 px · transparent PNG / SVG · max 1 MB"
+            error={errors.imageUrl}
+            required
+          >
+            <ImageUpload value={values.imageUrl} onChange={(url) => setValue("imageUrl", url)} aspect="square" maxMb={1} className="max-w-[200px]" />
           </Field>
           <Field label="Client name" error={errors.name} required>
             <Input value={values.name} onChange={(e) => setValue("name", e.target.value)} invalid={!!errors.name} placeholder="KOBE Industries" />
