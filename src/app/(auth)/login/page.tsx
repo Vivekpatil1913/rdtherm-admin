@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
@@ -8,6 +8,7 @@ import { Field } from "@/components/form/Field";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Toggle } from "@/components/ui/Toggle";
+import { Recaptcha, type RecaptchaHandle } from "@/components/ui/Recaptcha";
 import { useForm } from "@/hooks/useForm";
 import { rules } from "@/lib/validation";
 import { useAuth } from "@/providers/AuthProvider";
@@ -20,6 +21,14 @@ export default function LoginPage() {
   const toast = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(true);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaError, setCaptchaError] = useState("");
+  const recaptchaRef = useRef<RecaptchaHandle>(null);
+
+  const handleCaptcha = (token: string | null) => {
+    setCaptchaToken(token);
+    if (token) setCaptchaError("");
+  };
 
   const form = useForm({
     initialValues: { email: "admin@rdtherm.com", password: "Admin@1234" },
@@ -28,12 +37,19 @@ export default function LoginPage() {
       password: [rules.required("Please enter your password"), rules.minLength(6)],
     },
     onSubmit: async (values) => {
+      if (!captchaToken) {
+        setCaptchaError("Please confirm you're not a robot.");
+        return;
+      }
       try {
-        await login(values.email, values.password);
+        await login(values.email, values.password, captchaToken);
         toast.success("Welcome back", "Signed in to the R&D Therm CMS.");
         router.push("/dashboard");
       } catch (err) {
         toast.error("Sign in failed", errorMessage(err));
+        // reCAPTCHA tokens are single-use — reset after a failed attempt.
+        recaptchaRef.current?.reset();
+        setCaptchaToken(null);
       }
     },
   });
@@ -100,7 +116,14 @@ export default function LoginPage() {
           </Link>
         </div>
 
-        <Button type="submit" size="lg" loading={form.isSubmitting} className="mt-2 w-full">
+        <div>
+          <Recaptcha ref={recaptchaRef} onChange={handleCaptcha} />
+          {captchaError ? (
+            <span className="mt-1.5 block text-xs text-[var(--color-danger)]">{captchaError}</span>
+          ) : null}
+        </div>
+
+        <Button type="submit" size="lg" loading={form.isSubmitting} className="mt-1 w-full">
           Sign in
         </Button>
       </form>

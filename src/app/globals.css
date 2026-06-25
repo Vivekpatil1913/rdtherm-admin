@@ -216,6 +216,9 @@ button:disabled,
   color: var(--content-soft);
   font-size: 15px;
   line-height: 1.7;
+  /* Wrap long unbreakable strings so the editor never forces a horizontal scroll. */
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 .prose-cms > * + * { margin-top: 1em; }
 .prose-cms h1,
@@ -224,7 +227,7 @@ button:disabled,
 .prose-cms h4 { color: var(--content); font-weight: 700; line-height: 1.25; }
 .prose-cms h2 { font-size: 1.5rem; margin-top: 1.6em; margin-bottom: 0.4em; }
 .prose-cms h3 { font-size: 1.25rem; margin-top: 1.4em; margin-bottom: 0.3em; }
-.prose-cms p { margin: 0.7em 0; }
+.prose-cms p { margin: 0.7em 0; text-align: justify; }
 .prose-cms strong { color: var(--content); font-weight: 600; }
 .prose-cms a { color: var(--color-brand); text-decoration: underline; text-underline-offset: 3px; }
 .prose-cms ul, .prose-cms ol { margin: 0.8em 0; padding-left: 1.3em; }

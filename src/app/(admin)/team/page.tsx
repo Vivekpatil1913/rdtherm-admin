@@ -73,7 +73,7 @@ export default function TeamPage() {
                 <Input value={values.name} onChange={(e) => setValue("name", e.target.value)} invalid={!!errors.name} maxLength={50} placeholder="Rajeev Deshmukh" />
               </Field>
               <Field label="Role / Title" error={errors.role} required count={values.role.length} max={50}>
-                <Input value={values.role} onChange={(e) => setValue("role", e.target.value)} invalid={!!errors.role} maxLength={50} placeholder="Director — Engineering" />
+                <Input value={values.role} onChange={(e) => setValue("role", e.target.value.replace(/\d/g, ""))} invalid={!!errors.role} maxLength={50} placeholder="Director — Engineering" />
               </Field>
               <Field label="Group">
                 <Select value={values.group} onChange={(e) => setValue("group", e.target.value as TeamGroup)} options={[{ value: "director", label: "Board of Directors" }, { value: "team", label: "Team" }]} />

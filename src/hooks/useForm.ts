@@ -82,6 +82,22 @@ export function useForm<T extends Record<string, unknown>>({
       try {
         await onSubmit(values);
         return true;
+      } catch (err) {
+        // Surface server-side field errors (e.g. uniqueness) inline on the field.
+        const details = (err as { details?: unknown } | null)?.details;
+        if (details && typeof details === "object") {
+          const fieldErrs = Object.entries(details as Record<string, unknown>).filter(
+            ([k, v]) => k in values && typeof v === "string",
+          ) as [string, string][];
+          if (fieldErrs.length) {
+            setErrors((prev) => ({ ...prev, ...Object.fromEntries(fieldErrs) }));
+            setTouched((prev) => ({
+              ...prev,
+              ...Object.fromEntries(fieldErrs.map(([k]) => [k, true])),
+            }));
+          }
+        }
+        return false;
       } finally {
         submittingRef.current = false;
         setIsSubmitting(false);

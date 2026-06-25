@@ -21,6 +21,8 @@ interface RichTextEditorProps {
   value: string;
   onChange: (html: string) => void;
   placeholder?: string;
+  /** When false, renders read-only content (no toolbar, not editable). */
+  editable?: boolean;
 }
 
 interface ToolButton {
@@ -55,7 +57,7 @@ const GROUPS: ToolButton[][] = [
  * dependency-free; it can be swapped for Tiptap/Lexical later behind this same
  * `value`/`onChange` contract.
  */
-export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorProps) {
+export function RichTextEditor({ value, onChange, placeholder, editable = true }: RichTextEditorProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [focused, setFocused] = useState(false);
 
@@ -88,6 +90,7 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
         focused ? "border-[var(--color-brand)] ring-2 ring-[var(--color-brand)]/20" : "border-[var(--color-border-strong)]",
       )}
     >
+      {editable ? (
       <div className="flex flex-wrap items-center gap-1 border-b border-[var(--color-border)] bg-[var(--color-bg-subtle)] px-2 py-1.5">
         {GROUPS.map((group, gi) => (
           <div key={gi} className="flex items-center gap-0.5 border-r border-[var(--color-border)] pr-1 last:border-r-0">
@@ -112,16 +115,17 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
           </ToolbarBtn>
         </div>
       </div>
+      ) : null}
 
       <div className="relative">
         <div
           ref={ref}
-          contentEditable
+          contentEditable={editable}
           suppressContentEditableWarning
           onInput={handleInput}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          className="prose-cms min-h-56 max-w-none px-4 py-3 focus:outline-none"
+          className="prose-cms min-h-56 max-w-none break-words px-4 py-3 focus:outline-none"
         />
         {!value ? (
           <p className="pointer-events-none absolute left-4 top-3 text-sm text-[var(--color-muted)]">

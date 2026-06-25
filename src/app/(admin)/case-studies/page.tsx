@@ -68,9 +68,6 @@ export default function CaseStudiesPage() {
       empty={{ icon: Trophy, title: "No case studies yet", description: "Add your first project success story." }}
       renderForm={({ values, errors, setValue }) => (
         <>
-          <Field label="Cover image" error={errors.cover} required>
-            <ImageUpload value={values.cover} onChange={(url) => setValue("cover", url)} aspect="wide" preset={IMAGE_PRESETS.caseStudyCover} />
-          </Field>
           <Field label="Title" error={errors.title} required count={values.title.length} max={50}>
             <Input value={values.title} onChange={(e) => setValue("title", e.target.value)} invalid={!!errors.title} maxLength={50} placeholder="48.5 MT distillation column delivered early" />
           </Field>
@@ -82,6 +79,9 @@ export default function CaseStudiesPage() {
               <Input value={values.industry} onChange={(e) => setValue("industry", e.target.value)} invalid={!!errors.industry} maxLength={50} placeholder="Chemical & Petrochemical" />
             </Field>
           </div>
+          <Field label="Cover image" error={errors.cover} required>
+            <ImageUpload value={values.cover} onChange={(url) => setValue("cover", url)} aspect="wide" preset={IMAGE_PRESETS.caseStudyCover} />
+          </Field>
           <Field label="Summary" error={errors.summary} required>
             <RichTextEditor
               value={values.summary}

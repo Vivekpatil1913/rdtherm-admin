@@ -18,6 +18,8 @@ interface ImageUploadProps {
   maxMb?: number;
   /** Required dimensions (aspect ratio + recommended size) for this field. */
   preset?: ImagePreset;
+  /** When true, render the image read-only (no upload / replace / remove). */
+  readOnly?: boolean;
 }
 
 const ASPECT = {
@@ -31,11 +33,27 @@ const ASPECT = {
  * Selected files are read as data URLs for an instant local preview (mock).
  * A real backend would swap `readAsDataURL` for an upload + returned CDN URL.
  */
-export function ImageUpload({ value, onChange, aspect = "video", className, maxMb, preset }: ImageUploadProps) {
+export function ImageUpload({ value, onChange, aspect = "video", className, maxMb, preset, readOnly }: ImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const toast = useToast();
+
+  // Read-only — show the image (or a placeholder) without any upload controls.
+  if (readOnly) {
+    return (
+      <div className={cn("relative overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-border)]", ASPECT[aspect], className)}>
+        {value ? (
+          <img src={value} alt="Preview" className="size-full object-cover" />
+        ) : (
+          <div className="flex size-full flex-col items-center justify-center gap-2 bg-[var(--color-bg-subtle)] text-[var(--color-muted)]">
+            <ImagePlus className="size-7" />
+            <p className="text-xs">No image</p>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   const effectiveMaxMb = maxMb ?? IMAGE_RULES.maxMb;
   const maxBytes = effectiveMaxMb * 1024 * 1024;

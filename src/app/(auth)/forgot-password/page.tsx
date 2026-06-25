@@ -17,11 +17,9 @@ export default function ForgotPasswordPage() {
     initialValues: { email: "" },
     schema: { email: [rules.required("Please enter your email"), rules.email()] },
     onSubmit: async (values) => {
-      try {
-        await api.publicPost("/auth/forgot-password", { email: values.email });
-      } catch {
-        /* always show the same confirmation to avoid leaking which emails exist */
-      }
+      // On success → show the confirmation. If the email isn't linked to an
+      // account, the API throws a field error which useForm surfaces inline.
+      await api.publicPost("/auth/forgot-password", { email: values.email });
       setSent(true);
     },
   });
@@ -34,8 +32,9 @@ export default function ForgotPasswordPage() {
         </div>
         <h1 className="text-2xl font-bold tracking-tight text-[var(--color-content)]">Check your inbox</h1>
         <p className="mt-2 text-sm text-[var(--color-muted)]">
-          If an account exists for <span className="font-medium text-[var(--color-content)]">{form.values.email}</span>,
-          we&apos;ve sent a link to reset your password.
+          We&apos;ve sent a password reset link to{" "}
+          <span className="font-medium text-[var(--color-content)]">{form.values.email}</span>. The link is valid for 15
+          minutes.
         </p>
         <Button href="/login" variant="outline" className="mt-6 w-full" leftIcon={<ArrowLeft className="size-4" />}>
           Back to sign in

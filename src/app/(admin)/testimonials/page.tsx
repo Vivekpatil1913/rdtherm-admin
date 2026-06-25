@@ -106,7 +106,7 @@ export default function TestimonialsPage() {
               <Input value={values.author} onChange={(e) => setValue("author", e.target.value)} invalid={!!errors.author} maxLength={50} placeholder="Emily Carter" />
             </Field>
             <Field label="Role / Company" error={errors.role} required count={values.role.length} max={50}>
-              <Input value={values.role} onChange={(e) => setValue("role", e.target.value)} invalid={!!errors.role} maxLength={50} placeholder="Process Engineering Lead" />
+              <Input value={values.role} onChange={(e) => setValue("role", e.target.value.replace(/\d/g, ""))} invalid={!!errors.role} maxLength={50} placeholder="Process Engineering Lead" />
             </Field>
           </div>
           <Field label="Testimonial" error={errors.body} required count={values.body.length} max={300}>

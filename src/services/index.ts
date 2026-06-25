@@ -17,6 +17,7 @@ import type {
   Industry,
   JobOpening,
   Lead,
+  JobApplication,
   Logo,
   Product,
   QuoteRequest,
@@ -36,6 +37,7 @@ export const industryService = apiCollection<Industry>("/industries");
 export const openingService = apiCollection<JobOpening>("/careers");
 export const leadService = apiCollection<Lead>("/leads");
 export const quoteService = apiCollection<QuoteRequest>("/quotes");
+export const applicationService = apiCollection<JobApplication>("/applications");
 
 /** Site settings (singleton) — not a collection. */
 export const settingsService = {
@@ -62,6 +64,8 @@ export interface DashboardStats {
     leads: number;
   };
   leadsNew: number;
+  quotesNew: number;
+  applicationsNew: number;
   activeBlogs: number;
   activeProducts: number;
   recentLeads: Array<{

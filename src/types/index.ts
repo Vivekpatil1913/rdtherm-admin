@@ -79,7 +79,10 @@ export interface BlogPost extends BaseRecord {
   author: string;
   date: string;
   readTime: string;
+  /** Wide 21:9 banner shown on the article detail page. */
   cover: string;
+  /** Square 1:1 thumbnail shown on the blog grid cards. */
+  cardImage: string;
   /** Rich HTML produced by the editor. */
   content: string;
   views: number;
@@ -192,6 +195,24 @@ export interface QuoteRequest extends BaseRecord {
   configuration: QuoteConfigLine[];
   source: string;
   quoteStatus: QuoteStatus;
+}
+
+/* -------------------------- Job Applications --------------------------- */
+
+export type ApplicationStatus = "new" | "reviewing" | "shortlisted" | "rejected";
+
+export interface JobApplication extends BaseRecord {
+  name: string;
+  email: string;
+  phone: string;
+  role: string;
+  portfolio: string;
+  message: string;
+  resumeUrl: string;
+  resumeName: string;
+  source: string;
+  appStatus: ApplicationStatus;
+  feedback?: string;
 }
 
 /* ------------------------------- SEO ----------------------------------- */

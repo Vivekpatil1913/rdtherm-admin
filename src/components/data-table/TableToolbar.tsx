@@ -64,13 +64,24 @@ export function TableToolbar({
         </div>
       ) : (
         <>
-          <div className="w-full sm:max-w-xs">
+          <div className="relative w-full sm:max-w-xs">
             <Input
               value={search}
               onChange={(e) => onSearch(e.target.value)}
               placeholder={searchPlaceholder}
               leftIcon={<Search className="size-4" />}
+              className={search ? "pr-9" : undefined}
             />
+            {search ? (
+              <button
+                type="button"
+                onClick={() => onSearch("")}
+                aria-label="Clear search"
+                className="absolute right-2.5 top-1/2 inline-flex size-6 -translate-y-1/2 items-center justify-center rounded-full text-[var(--color-muted)] transition-colors hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-content)]"
+              >
+                <X className="size-3.5" />
+              </button>
+            ) : null}
           </div>
           {filters.length ? (
             <div className="flex flex-wrap items-center gap-2">

@@ -30,6 +30,8 @@ const CATEGORIES = ["Manufacturing", "Automation", "Engineering", "Codes & Stand
 
 interface BlogEditorProps {
   post?: BlogPost;
+  /** Read-only mode — disables all inputs and hides save (used by the View action). */
+  readOnly?: boolean;
 }
 
 type FormValues = {
@@ -39,11 +41,12 @@ type FormValues = {
   category: string;
   author: string;
   cover: string;
+  cardImage: string;
   content: string;
   date: string;
 }
 
-export function BlogEditor({ post }: BlogEditorProps) {
+export function BlogEditor({ post, readOnly = false }: BlogEditorProps) {
   const router = useRouter();
   const crud = useCrud(blogService, "Article");
 
@@ -55,6 +58,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
       category: post?.category ?? "Manufacturing",
       author: post?.author ?? "R&D Therm Editorial",
       cover: post?.cover ?? "",
+      cardImage: post?.cardImage ?? "",
       content: post?.content ?? "",
       date: post?.date ?? new Date().toISOString().slice(0, 10),
     },
@@ -62,8 +66,9 @@ export function BlogEditor({ post }: BlogEditorProps) {
       title: [rules.required("Please enter the title"), rules.minLength(6), rules.maxLength(50)],
       excerpt: [rules.required("Please enter the excerpt"), rules.maxLength(150)],
       content: [requiredHtml("Please enter the content")],
-      author: [rules.required("Please enter the author"), rules.maxLength(50)],
+      author: [rules.required("Please enter the author"), rules.maxLength(35)],
       cover: [rules.required("Please upload a cover image")],
+      cardImage: [rules.required("Please upload a card image")],
     },
     onSubmit: async (values) => {
       const payload = {
@@ -98,18 +103,22 @@ export function BlogEditor({ post }: BlogEditorProps) {
           </Button>
           <div>
             <h1 className="text-xl font-bold tracking-tight text-[var(--color-content)]">
-              {post ? "Edit article" : "New article"}
+              {post ? (readOnly ? "View article" : "Edit article") : "New article"}
             </h1>
             <p className="text-[13px] text-[var(--color-muted)]">
-              {post ? `Editing “${post.title}”` : "Draft a new blog post or case study."}
+              {post
+                ? readOnly
+                  ? `Viewing “${post.title}”`
+                  : `Editing “${post.title}”`
+                : "Draft a new blog post or case study."}
             </p>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
-        {/* Main column */}
-        <div className="flex flex-col gap-5">
+        {/* Main column — min-w-0 lets it shrink so long content wraps instead of widening the grid. */}
+        <div className="flex min-w-0 flex-col gap-5">
           <Card padded className="flex flex-col gap-4">
             <Field label="Title" error={form.touched.title ? form.errors.title : ""} required count={form.values.title.length} max={50}>
               <Input
@@ -118,6 +127,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
                 onBlur={() => form.handleBlur("title")}
                 invalid={!!form.errors.title}
                 maxLength={50}
+                disabled={readOnly}
                 placeholder="How automation is shaping the future of manufacturing"
               />
             </Field>
@@ -129,23 +139,42 @@ export function BlogEditor({ post }: BlogEditorProps) {
                 invalid={!!form.errors.excerpt}
                 rows={2}
                 maxLength={150}
+                disabled={readOnly}
               />
             </Field>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Content</CardTitle>
+              <CardTitle>
+                Content <span className="text-[var(--color-danger)]">*</span>
+              </CardTitle>
               <span className="text-[12px] text-[var(--color-muted)]">{readingTime(form.values.content)}</span>
             </CardHeader>
             <CardBody>
               <RichTextEditor
                 value={form.values.content}
                 onChange={(html) => form.setValue("content", html)}
+                editable={!readOnly}
                 placeholder="Start writing your article…"
               />
               {form.touched.content && form.errors.content ? (
                 <p className="mt-2 text-xs text-[var(--color-danger)]">{form.errors.content}</p>
+              ) : null}
+            </CardBody>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                Cover image <span className="text-[var(--color-danger)]">*</span>
+              </CardTitle>
+              <span className="text-[12px] text-[var(--color-muted)]">Wide 21:9 · article banner</span>
+            </CardHeader>
+            <CardBody>
+              <ImageUpload value={form.values.cover} onChange={(url) => form.setValue("cover", url)} aspect="wide" preset={IMAGE_PRESETS.blogCover} readOnly={readOnly} />
+              {form.touched.cover && form.errors.cover ? (
+                <p className="mt-2 text-xs text-[var(--color-danger)]">{form.errors.cover}</p>
               ) : null}
             </CardBody>
           </Card>
@@ -158,11 +187,11 @@ export function BlogEditor({ post }: BlogEditorProps) {
               <CardTitle>Publish</CardTitle>
             </CardHeader>
             <CardBody className="flex flex-col gap-4">
-              <Field label="Author" error={form.touched.author ? form.errors.author : ""} required>
-                <Input value={form.values.author} onChange={(e) => form.setValue("author", e.target.value)} onBlur={() => form.handleBlur("author")} invalid={!!form.errors.author} maxLength={50} />
+              <Field label="Author" error={form.touched.author ? form.errors.author : ""} required count={form.values.author.length} max={35}>
+                <Input value={form.values.author} onChange={(e) => form.setValue("author", e.target.value)} onBlur={() => form.handleBlur("author")} invalid={!!form.errors.author} maxLength={35} disabled={readOnly} />
               </Field>
               <Field label="Category">
-                <Select value={form.values.category} onChange={(e) => form.setValue("category", e.target.value)} options={CATEGORIES.map((c) => ({ value: c, label: c }))} />
+                <Select value={form.values.category} onChange={(e) => form.setValue("category", e.target.value)} options={CATEGORIES.map((c) => ({ value: c, label: c }))} disabled={readOnly} />
               </Field>
             </CardBody>
           </Card>
@@ -170,13 +199,14 @@ export function BlogEditor({ post }: BlogEditorProps) {
           <Card>
             <CardHeader>
               <CardTitle>
-                Cover image <span className="text-[var(--color-danger)]">*</span>
+                Card image <span className="text-[var(--color-danger)]">*</span>
               </CardTitle>
+              <span className="text-[12px] text-[var(--color-muted)]">Square · blog grid</span>
             </CardHeader>
             <CardBody>
-              <ImageUpload value={form.values.cover} onChange={(url) => form.setValue("cover", url)} aspect="wide" preset={IMAGE_PRESETS.blogCover} />
-              {form.touched.cover && form.errors.cover ? (
-                <p className="mt-2 text-xs text-[var(--color-danger)]">{form.errors.cover}</p>
+              <ImageUpload value={form.values.cardImage} onChange={(url) => form.setValue("cardImage", url)} aspect="square" preset={IMAGE_PRESETS.blogCard} readOnly={readOnly} />
+              {form.touched.cardImage && form.errors.cardImage ? (
+                <p className="mt-2 text-xs text-[var(--color-danger)]">{form.errors.cardImage}</p>
               ) : null}
             </CardBody>
           </Card>
@@ -184,12 +214,20 @@ export function BlogEditor({ post }: BlogEditorProps) {
       </div>
 
       <div className="mt-6 flex items-center justify-end gap-2">
-        <Button variant="outline" type="button" leftIcon={<Eye className="size-4" />}>
-          Preview
-        </Button>
-        <Button type="submit" loading={form.isSubmitting} leftIcon={<Save className="size-4" />}>
-          {post ? "Save changes" : "Publish article"}
-        </Button>
+        {readOnly ? (
+          <Button variant="outline" href="/blogs">
+            Back to articles
+          </Button>
+        ) : (
+          <>
+            <Button variant="outline" type="button" leftIcon={<Eye className="size-4" />}>
+              Preview
+            </Button>
+            <Button type="submit" loading={form.isSubmitting} leftIcon={<Save className="size-4" />}>
+              {post ? "Save changes" : "Publish article"}
+            </Button>
+          </>
+        )}
       </div>
     </form>
   );

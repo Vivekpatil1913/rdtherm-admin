@@ -89,18 +89,16 @@ export function ResourceManager<T extends { id: string }, V extends Record<strin
     initialValues: emptyValues,
     schema,
     onSubmit: async (values) => {
-      try {
-        if (editing) {
-          await crud.update(editing.id, fromForm(values) as Partial<T>);
-        } else {
-          await crud.create(fromForm(values));
-        }
-        setModalOpen(false);
-        setEditing(null);
-        resource.refetch();
-      } catch {
-        /* error toast already shown by useCrud — keep the modal open */
+      // useCrud shows the error toast and re-throws; useForm maps any field
+      // errors (e.g. duplicate name) inline and keeps the modal open.
+      if (editing) {
+        await crud.update(editing.id, fromForm(values) as Partial<T>);
+      } else {
+        await crud.create(fromForm(values));
       }
+      setModalOpen(false);
+      setEditing(null);
+      resource.refetch();
     },
   });
 

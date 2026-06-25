@@ -17,24 +17,42 @@ interface SidebarProps {
 }
 
 export function Sidebar({ collapsed, mobileOpen, onCloseMobile }: SidebarProps) {
-  // Live "new leads" count shown as a badge on the Contact Leads link.
-  const [newLeads, setNewLeads] = useState(0);
+  // Live "new" counts shown as badges on the engagement links.
+  const [counts, setCounts] = useState({ leads: 0, quotes: 0, applications: 0 });
   const pathname = usePathname();
 
   useEffect(() => {
     let cancelled = false;
-    dashboardService
-      .stats()
-      .then((s) => !cancelled && setNewLeads(s.leadsNew))
-      .catch(() => {});
+    const load = () =>
+      dashboardService
+        .stats()
+        .then(
+          (s) =>
+            !cancelled &&
+            setCounts({ leads: s.leadsNew, quotes: s.quotesNew, applications: s.applicationsNew }),
+        )
+        .catch(() => {});
+    load();
+    // Refresh immediately when a record's status changes (same-route updates).
+    window.addEventListener("rdtherm:stats", load);
     return () => {
       cancelled = true;
+      window.removeEventListener("rdtherm:stats", load);
     };
-    // Refresh the count whenever the route changes (e.g. after triaging a lead).
+    // Also refresh whenever the route changes (e.g. after triaging a record).
   }, [pathname]);
 
-  const badgeFor = (href: string) =>
-    href === "/leads" && newLeads > 0 ? String(newLeads) : undefined;
+  const badgeFor = (href: string) => {
+    const n =
+      href === "/leads"
+        ? counts.leads
+        : href === "/quotes"
+          ? counts.quotes
+          : href === "/applications"
+            ? counts.applications
+            : 0;
+    return n > 0 ? String(n) : undefined;
+  };
 
   return (
     <>

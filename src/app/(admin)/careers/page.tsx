@@ -51,25 +51,25 @@ export default function CareersPage() {
       columns={columns}
       searchPlaceholder="Search positions…"
       extraFilter={{ key: "department", options: DEPARTMENTS.map((d) => ({ value: d, label: d })) }}
-      emptyValues={{ title: "", department: "Engineering", location: "Nashik, India", type: "Full-time", description: "" }}
-      schema={{ title: [rules.required("Please enter the job title"), rules.minLength(4), rules.maxLength(50)], description: [rules.required("Please enter the description"), rules.minLength(15), rules.maxLength(200)], location: [rules.required("Please enter the location"), rules.maxLength(100)] }}
+      emptyValues={{ title: "", department: "", location: "", type: "", description: "" }}
+      schema={{ title: [rules.required("Please enter the job title"), rules.minLength(4), rules.maxLength(50)], department: [rules.required("Please select a department")], type: [rules.required("Please select a type")], description: [rules.required("Please enter the description"), rules.minLength(15), rules.maxLength(200)], location: [rules.required("Please enter the location"), rules.maxLength(100)] }}
       toForm={(row) => ({ title: row.title, department: row.department, location: row.location, type: row.type, description: row.description })}
       fromForm={(v) => ({ ...v, isActive: true, order: 0, createdAt: "", updatedAt: "" })}
       empty={{ icon: BriefcaseBusiness, title: "No open positions", description: "Post your first job opening." }}
       renderForm={({ values, errors, setValue }) => (
         <>
           <Field label="Job title" error={errors.title} required count={values.title.length} max={50}>
-            <Input value={values.title} onChange={(e) => setValue("title", e.target.value)} invalid={!!errors.title} maxLength={50} placeholder="Senior Mechanical Design Engineer" />
+            <Input value={values.title} onChange={(e) => setValue("title", e.target.value.replace(/\d/g, ""))} invalid={!!errors.title} maxLength={50} placeholder="Senior Mechanical Design Engineer" />
           </Field>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <Field label="Department">
-              <Select value={values.department} onChange={(e) => setValue("department", e.target.value)} options={DEPARTMENTS.map((d) => ({ value: d, label: d }))} />
+            <Field label="Department" error={errors.department} required>
+              <Select value={values.department} onChange={(e) => setValue("department", e.target.value)} invalid={!!errors.department} placeholder="Select department" options={DEPARTMENTS.map((d) => ({ value: d, label: d }))} />
             </Field>
             <Field label="Location" error={errors.location} required>
               <Input value={values.location} onChange={(e) => setValue("location", e.target.value)} invalid={!!errors.location} maxLength={100} placeholder="Nashik, India" />
             </Field>
-            <Field label="Type">
-              <Select value={values.type} onChange={(e) => setValue("type", e.target.value)} options={TYPES.map((t) => ({ value: t, label: t }))} />
+            <Field label="Type" error={errors.type} required>
+              <Select value={values.type} onChange={(e) => setValue("type", e.target.value)} invalid={!!errors.type} placeholder="Select type" options={TYPES.map((t) => ({ value: t, label: t }))} />
             </Field>
           </div>
           <Field label="Description" error={errors.description} required count={values.description.length} max={200}>

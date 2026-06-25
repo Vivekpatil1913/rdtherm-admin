@@ -22,34 +22,43 @@ export function Logo({ collapsed = false, className }: { collapsed?: boolean; cl
     </span>
   );
 
-  // Narrow rail — only room for a square mark.
-  if (collapsed) {
-    return <span className={cn("flex items-center", className)}>{badge}</span>;
-  }
-
-  if (imgOk) {
-    return (
-      <span className={cn("flex items-center", className)}>
-        <img
-          src={LOGO_SRC}
-          alt="R&D Therm"
-          onError={() => setImgOk(false)}
-          className="h-12 w-auto max-w-[205px] object-contain object-left"
-        />
-      </span>
-    );
-  }
-
-  // Fallback if the image can't load.
-  return (
-    <span className={cn("flex items-center gap-2.5", className)}>
+  // Bold text wordmark — fully theme-aware via tokens, so it stays crisp and
+  // readable on the dark sidebar (the brand PNG has dark text that washes out).
+  const wordmark = (
+    <span className="flex items-center gap-2.5">
       {badge}
       <span className="flex flex-col leading-none">
         <span className="text-[15px] font-bold tracking-tight text-[var(--color-content)]">
           R&amp;D Therm
         </span>
-        <span className="mt-0.5 text-[11px] font-medium text-[var(--color-muted)]">CMS Admin</span>
+        <span className="mt-0.5 text-[11px] font-medium text-[var(--color-muted)]">
+          A Konark Global Co.
+        </span>
       </span>
+    </span>
+  );
+
+  // Narrow rail — only room for a square mark.
+  if (collapsed) {
+    return <span className={cn("flex items-center", className)}>{badge}</span>;
+  }
+
+  // Image failed to load — use the wordmark in either theme.
+  if (!imgOk) {
+    return <span className={cn("flex items-center", className)}>{wordmark}</span>;
+  }
+
+  return (
+    <span className={cn("flex items-center", className)}>
+      {/* Light mode: the full brand logo image. */}
+      <img
+        src={LOGO_SRC}
+        alt="R&D Therm"
+        onError={() => setImgOk(false)}
+        className="h-12 w-auto max-w-[205px] object-contain object-left dark:hidden"
+      />
+      {/* Dark mode: readable text wordmark (no light logo asset available). */}
+      <span className="hidden dark:flex">{wordmark}</span>
     </span>
   );
 }

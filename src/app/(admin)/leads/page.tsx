@@ -16,7 +16,6 @@ import { DataTable, type Column } from "@/components/data-table/DataTable";
 import { TableToolbar } from "@/components/data-table/TableToolbar";
 import { RowActionBar } from "@/components/data-table/RowActionBar";
 import { useResource } from "@/hooks/useResource";
-import { useCrud } from "@/hooks/useCrud";
 import { leadService } from "@/services";
 import { useToast } from "@/providers/ToastProvider";
 import { errorMessage } from "@/services/apiError";
@@ -44,11 +43,9 @@ const STATUS_OPTIONS = [
 
 export default function LeadsPage() {
   const resource = useResource<Lead>(leadService, { initialSort: { sortBy: "createdAt", sortDir: "desc" } });
-  const crud = useCrud(leadService, "Lead");
   const toast = useToast();
   const [viewing, setViewing] = useState<Lead | null>(null);
-  const [deleting, setDeleting] = useState<Lead | null>(null);
-  // Close flow: selecting "Closed" reveals a required feedback box before saving.
+  // Status-change flow: non-closed changes confirm first; "closed" needs feedback.
   const [draftStatus, setDraftStatus] = useState<LeadStatus | null>(null);
   const [feedback, setFeedback] = useState("");
   const [savingStatus, setSavingStatus] = useState(false);
@@ -83,6 +80,8 @@ export default function LeadsPage() {
       setDraftStatus(null);
       setFeedback("");
       resource.refetch();
+      // Tell the sidebar to refresh its "new" counts immediately.
+      window.dispatchEvent(new Event("rdtherm:stats"));
     } catch (err) {
       toast.error("Could not update lead", errorMessage(err));
     } finally {
@@ -137,7 +136,7 @@ export default function LeadsPage() {
           sortDir={resource.sort?.sortDir}
           onSort={resource.toggleSort}
           rowActions={(row) => (
-            <RowActionBar onView={() => setViewing(row)} onDelete={() => setDeleting(row)} />
+            <RowActionBar onView={() => setViewing(row)} />
           )}
           empty={{ icon: Inbox, title: "No leads here", description: "New enquiries will appear in this inbox." }}
         />
@@ -160,7 +159,7 @@ export default function LeadsPage() {
             <Button variant="outline" onClick={() => setViewing(null)}>
               Close
             </Button>
-            {viewing ? (
+            {viewing && viewing.leadStatus !== "closed" ? (
               <Button href={`mailto:${viewing.email}`} leftIcon={<Mail className="size-4" />}>
                 Reply by email
               </Button>
@@ -211,12 +210,8 @@ export default function LeadsPage() {
                     onChange={(e) => {
                       const next = e.target.value as LeadStatus;
                       if (next === viewing.leadStatus) return;
-                      if (next === "closed") {
-                        setDraftStatus("closed"); // reveal feedback box; persist on confirm
-                      } else {
-                        setDraftStatus(null);
-                        updateStatus(viewing, next);
-                      }
+                      // "closed" → feedback panel; other moves → confirmation dialog.
+                      setDraftStatus(next);
                     }}
                     options={forwardOptions(viewing.leadStatus)}
                   />
@@ -274,19 +269,22 @@ export default function LeadsPage() {
         ) : null}
       </Modal>
 
+      {/* Confirm any non-closed status change (closed has its own feedback step). */}
       <ConfirmDialog
-        open={!!deleting}
-        onClose={() => setDeleting(null)}
-        onConfirm={async () => {
-          if (deleting) {
-            await crud.remove(deleting.id);
-            setDeleting(null);
-            resource.refetch();
-          }
+        open={!!draftStatus && draftStatus !== "closed"}
+        onClose={() => setDraftStatus(null)}
+        onConfirm={() => {
+          if (viewing && draftStatus) updateStatus(viewing, draftStatus);
         }}
-        title="Delete lead?"
-        confirmLabel="Delete"
-        loading={crud.busy}
+        danger={false}
+        title={
+          draftStatus && draftStatus !== "closed"
+            ? `Change status to ${STATUS_OPTIONS.find((o) => o.value === draftStatus)?.label}?`
+            : ""
+        }
+        body="Update this lead's pipeline stage? You can still move it forward later."
+        confirmLabel="Change status"
+        loading={savingStatus}
       />
     </>
   );

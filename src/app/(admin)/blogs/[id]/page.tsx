@@ -15,6 +15,12 @@ export default function EditBlogPage() {
   const params = useParams<{ id: string }>();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
+  const [readOnly, setReadOnly] = useState(false);
+
+  // `?view=1` (from the list's View action) opens the editor read-only.
+  useEffect(() => {
+    setReadOnly(new URLSearchParams(window.location.search).get("view") === "1");
+  }, []);
 
   useEffect(() => {
     blogService.get(params.id).then((p) => {
@@ -48,5 +54,5 @@ export default function EditBlogPage() {
     );
   }
 
-  return <BlogEditor post={post} />;
+  return <BlogEditor post={post} readOnly={readOnly} />;
 }

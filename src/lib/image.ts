@@ -52,6 +52,8 @@ export const IMAGE_PRESETS = {
   productGallery: { ratio: { w: 4, h: 3 }, recW: 1200, recH: 900, minW: 800, minH: 600 },
   /** Blog cover — 21:9 wide banner on the article detail page. */
   blogCover: { ratio: { w: 21, h: 9 }, recW: 1680, recH: 720, minW: 1260, minH: 540 },
+  /** Blog card thumbnail — 1:1 square shown on the blog grid. */
+  blogCard: { ratio: { w: 1, h: 1 }, recW: 1000, recH: 1000, minW: 600, minH: 600 },
   /** Case study cover — 21:9 wide banner on the detail page. */
   caseStudyCover: { ratio: { w: 21, h: 9 }, recW: 1680, recH: 720, minW: 1260, minH: 540 },
   /** Industry cover — 5:4 section image. */

@@ -82,7 +82,7 @@ export default function BlogsPage() {
           onSort={resource.toggleSort}
           rowActions={(row) => (
             <RowActionBar
-              onView={() => router.push(`/blogs/${row.id}`)}
+              onView={() => router.push(`/blogs/${row.id}?view=1`)}
               onEdit={() => router.push(`/blogs/${row.id}`)}
               onDelete={() => setDeleting(row)}
               active={row.isActive}
