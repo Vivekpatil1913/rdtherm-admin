@@ -92,7 +92,14 @@
       "Bash(grep -n \"return {\\\\|setError\\\\|setErrors\\\\|handleSubmit\\\\|errors,\\\\|touched,\\\\|setValue,\\\\|reset,\\\\|isSubmitting\" /d/rdtherm-admin/src/hooks/useForm.ts)",
       "Bash(node -c src/modules/auth/auth.service.js)",
       "Bash(curl -s --max-time 8 -X POST http://127.0.0.1:4000/api/auth/forgot-password -H \"Content-Type: application/json\" -d '{\"email\":\"rohinisumago@gmail.com\"}' -w \"\\\\nHTTP %{http_code}\\\\n\")",
-      "Bash(curl -s --max-time 10 -X POST http://127.0.0.1:4000/api/auth/forgot-password -H \"Content-Type: application/json\" -d '{\"email\":\"admin@rdtherm.com\"}' -w \"\\\\nHTTP %{http_code}\\\\n\")"
+      "Bash(curl -s --max-time 10 -X POST http://127.0.0.1:4000/api/auth/forgot-password -H \"Content-Type: application/json\" -d '{\"email\":\"admin@rdtherm.com\"}' -w \"\\\\nHTTP %{http_code}\\\\n\")",
+      "Bash(curl -s --max-time 10 \"https://rdtherm-api.sumagodemo.com/api/public/products\" -o /dev/null -w \"HTTP %{http_code}\\\\n\")",
+      "Bash(curl -s --max-time 10 \"https://rdtherm-api.sumagodemo.com/api/public/blogs?page=1&limit=6\" -w \"\\\\nHTTP %{http_code}\\\\n\")",
+      "Bash(curl -s --max-time 10 \"https://rdtherm-api.sumagodemo.com/api/public/blogs?page=1&limit=2\")",
+      "Bash(node -e \"let s='';process.stdin.on\\('data',d=>s+=d\\).on\\('end',\\(\\)=>{const j=JSON.parse\\(s\\);console.log\\('keys:',Object.keys\\(j.data.items[0]\\).join\\(','\\)\\);console.log\\('cardImage:',j.data.items[0].cardImage\\);console.log\\('total:',j.data.total\\)}\\)\")",
+      "Bash(curl -s --max-time 10 \"https://rdtherm-api.sumagodemo.com/api/public/testimonials\" -o /dev/null -w \"HTTP %{http_code}\\\\n\")",
+      "Bash(curl -s --max-time 10 \"https://rdtherm-api.sumagodemo.com/api/public/industries\" -o /dev/null -w \"industries HTTP %{http_code}\\\\n\")",
+      "Bash(curl -s --max-time 10 \"https://rdtherm-api.sumagodemo.com/api/public/logos?kind=client\" -o /dev/null -w \"logos HTTP %{http_code}\\\\n\")"
     ]
   }
 }
