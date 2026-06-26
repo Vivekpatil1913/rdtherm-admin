@@ -9,14 +9,12 @@ import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
-import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { ApplicationStatusBadge } from "@/components/ui/StatusBadge";
 import { Pagination } from "@/components/ui/Pagination";
 import { DataTable, type Column } from "@/components/data-table/DataTable";
 import { TableToolbar } from "@/components/data-table/TableToolbar";
 import { RowActionBar } from "@/components/data-table/RowActionBar";
 import { useResource } from "@/hooks/useResource";
-import { useCrud } from "@/hooks/useCrud";
 import { applicationService } from "@/services";
 import { useToast } from "@/providers/ToastProvider";
 import { errorMessage } from "@/services/apiError";
@@ -44,10 +42,8 @@ const STATUS_OPTIONS = [
 
 export default function ApplicationsPage() {
   const resource = useResource<JobApplication>(applicationService, { initialSort: { sortBy: "createdAt", sortDir: "desc" } });
-  const crud = useCrud(applicationService, "Job application");
   const toast = useToast();
   const [viewing, setViewing] = useState<JobApplication | null>(null);
-  const [deleting, setDeleting] = useState<JobApplication | null>(null);
   // Reject flow: selecting "Rejected" reveals a required feedback box before saving.
   const [draftStatus, setDraftStatus] = useState<ApplicationStatus | null>(null);
   const [feedback, setFeedback] = useState("");
@@ -137,7 +133,7 @@ export default function ApplicationsPage() {
           sortDir={resource.sort?.sortDir}
           onSort={resource.toggleSort}
           rowActions={(row) => (
-            <RowActionBar onView={() => openView(row)} onDelete={() => setDeleting(row)} />
+            <RowActionBar onView={() => openView(row)} />
           )}
           empty={{ icon: Inbox, title: "No applications yet", description: "Applications from the Careers page will appear here." }}
         />
@@ -310,21 +306,6 @@ export default function ApplicationsPage() {
           </div>
         ) : null}
       </Modal>
-
-      <ConfirmDialog
-        open={!!deleting}
-        onClose={() => setDeleting(null)}
-        onConfirm={async () => {
-          if (deleting) {
-            await crud.remove(deleting.id);
-            setDeleting(null);
-            resource.refetch();
-          }
-        }}
-        title="Delete application?"
-        confirmLabel="Delete"
-        loading={crud.busy}
-      />
     </>
   );
 }
