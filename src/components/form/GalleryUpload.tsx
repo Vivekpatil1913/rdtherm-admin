@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 import { uploadImage } from "@/services";
 import { useToast } from "@/providers/ToastProvider";
 import { errorMessage } from "@/services/apiError";
-import { validateImageFile, GALLERY_RULES, IMAGE_PRESETS, presetHint } from "@/lib/image";
+import { validateImageFile, GALLERY_RULES } from "@/lib/image";
 import { Input } from "@/components/ui/Input";
 import type { ProductImage } from "@/types";
 
@@ -45,13 +45,13 @@ export function GalleryUpload({ value, onChange }: GalleryUploadProps) {
     const added: ProductImage[] = [];
     try {
       for (const file of files) {
-        const invalid = await validateImageFile(file, { maxBytes, maxMb, preset: IMAGE_PRESETS.productGallery });
+        const invalid = await validateImageFile(file, { maxBytes, maxMb, skipDimensions: true });
         if (invalid) {
           toast.error(`Skipped “${file.name}”`, invalid);
           continue;
         }
         try {
-          const url = await uploadImage(file, { maxKb: Math.round(maxBytes / 1024) });
+          const url = await uploadImage(file, { maxKb: Math.round(maxBytes / 1024), skipDimensions: true });
           added.push({ url, alt: "", label: undefined });
         } catch (err) {
           toast.error(`Upload failed: ${file.name}`, errorMessage(err));
@@ -118,7 +118,7 @@ export function GalleryUpload({ value, onChange }: GalleryUploadProps) {
       </div>
 
       <div className="flex items-center justify-between text-[12px] text-[var(--color-muted)]">
-        <span>{`Up to ${maxImages} images · ${presetHint(IMAGE_PRESETS.productGallery)}`}</span>
+        <span>{`Up to ${maxImages} images · Max: ${maxMb} MB each`}</span>
         <span className="tabular-nums">
           {value.length} / {maxImages}
         </span>

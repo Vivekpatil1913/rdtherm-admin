@@ -92,11 +92,21 @@ export const profileService = {
   logoutAll: () => api.post<{ message: string }>("/auth/logout-all"),
 };
 
-/** Upload an image file; returns its public URL. Pass `maxKb` to cap the size server-side. */
-export async function uploadImage(file: File, opts: { maxKb?: number } = {}): Promise<string> {
+/**
+ * Upload an image file; returns its public URL. Pass `maxKb` to cap the size
+ * server-side, or `skipDimensions` to accept any pixel dimensions.
+ */
+export async function uploadImage(
+  file: File,
+  opts: { maxKb?: number; skipDimensions?: boolean } = {},
+): Promise<string> {
   const form = new FormData();
   form.append("file", file);
-  const path = opts.maxKb ? `/uploads?maxKb=${opts.maxKb}` : "/uploads";
+  const query = new URLSearchParams();
+  if (opts.maxKb) query.set("maxKb", String(opts.maxKb));
+  if (opts.skipDimensions) query.set("skipDimensions", "1");
+  const qs = query.toString();
+  const path = qs ? `/uploads?${qs}` : "/uploads";
   const res = await api.upload<{ url: string }>(path, form);
   return res.url;
 }

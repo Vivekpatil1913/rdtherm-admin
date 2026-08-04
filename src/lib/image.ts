@@ -46,10 +46,8 @@ const RATIO_TOLERANCE = 0.03;
  * actually displays the image (so a correctly-sized image always looks right).
  */
 export const IMAGE_PRESETS = {
-  /** Product cover — shown as 16:9 cards across the site. */
-  productCover: { ratio: { w: 16, h: 9 }, recW: 1600, recH: 900, minW: 800, minH: 450 },
-  /** Product gallery — landscape 4:3 lightbox tiles. */
-  productGallery: { ratio: { w: 4, h: 3 }, recW: 1200, recH: 900, minW: 800, minH: 600 },
+  /* Product cover and gallery intentionally have no preset — any dimensions are
+     accepted there, only the 1 MB size cap applies. */
   /** Blog cover — 21:9 wide banner on the article detail page. */
   blogCover: { ratio: { w: 21, h: 9 }, recW: 1680, recH: 720, minW: 1260, minH: 540 },
   /** Blog card thumbnail — 1:1 square shown on the blog grid. */
@@ -85,10 +83,14 @@ function readDimensions(file: File): Promise<{ width: number; height: number }> 
   });
 }
 
-/** Returns an error message if the file is invalid, otherwise null. */
+/**
+ * Returns an error message if the file is invalid, otherwise null.
+ * Pass `skipDimensions` for fields where any image size is acceptable — only the
+ * file type and size cap are then enforced.
+ */
 export async function validateImageFile(
   file: File,
-  opts: { maxBytes?: number; maxMb?: number; preset?: ImagePreset } = {},
+  opts: { maxBytes?: number; maxMb?: number; preset?: ImagePreset; skipDimensions?: boolean } = {},
 ): Promise<string | null> {
   const maxBytes = opts.maxBytes ?? IMAGE_RULES.maxBytes;
   const maxMb = opts.maxMb ?? IMAGE_RULES.maxMb;
@@ -100,6 +102,8 @@ export async function validateImageFile(
   }
   // SVG is vector — no pixel dimensions to check.
   if (file.type === "image/svg+xml") return null;
+  // Field opted out of every pixel-dimension rule.
+  if (opts.skipDimensions) return null;
 
   let width = 0;
   let height = 0;

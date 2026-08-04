@@ -106,7 +106,10 @@
       "Bash(node -c src/modules/crud.factory.js)",
       "Bash(grep -rln \"code shop\\\\|Every machine\\\\|fibre laser\\\\|Cutting.*Forming\\\\|Machinery\" src/sections/manufacturing)",
       "Bash(grep -rln \"Every machine\\\\|code shop\\\\|press brake\" src/)",
-      "PowerShell(Add-Type -AssemblyName System.Drawing; $img = [System.Drawing.Image]::FromFile\\(\"d:\\\\rdtherm-web\\\\public\\\\images\\\\hero\\\\rdtherm-logo.png\"\\); \"Width=$\\($img.Width\\) Height=$\\($img.Height\\)\"; $img.Dispose\\(\\))"
+      "PowerShell(Add-Type -AssemblyName System.Drawing; $img = [System.Drawing.Image]::FromFile\\(\"d:\\\\rdtherm-web\\\\public\\\\images\\\\hero\\\\rdtherm-logo.png\"\\); \"Width=$\\($img.Width\\) Height=$\\($img.Height\\)\"; $img.Dispose\\(\\))",
+      "PowerShell($c = Get-NetTCPConnection -LocalPort 3001 -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1; if \\($c\\) { $p = Get-Process -Id $c.OwningProcess -ErrorAction SilentlyContinue; \"PID $\\($c.OwningProcess\\) — $\\($p.ProcessName\\) — started $\\($p.StartTime\\)\" } else { \"Nothing listening on 3001\" })",
+      "Bash(npx next *)",
+      "Bash(break)"
     ]
   }
 }

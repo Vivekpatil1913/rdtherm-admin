@@ -18,6 +18,8 @@ interface ImageUploadProps {
   maxMb?: number;
   /** Required dimensions (aspect ratio + recommended size) for this field. */
   preset?: ImagePreset;
+  /** Accept any image dimensions — only the file type and size cap are enforced. */
+  skipDimensions?: boolean;
   /** When true, render the image read-only (no upload / replace / remove). */
   readOnly?: boolean;
 }
@@ -33,7 +35,7 @@ const ASPECT = {
  * Selected files are read as data URLs for an instant local preview (mock).
  * A real backend would swap `readAsDataURL` for an upload + returned CDN URL.
  */
-export function ImageUpload({ value, onChange, aspect = "video", className, maxMb, preset, readOnly }: ImageUploadProps) {
+export function ImageUpload({ value, onChange, aspect = "video", className, maxMb, preset, skipDimensions, readOnly }: ImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -57,21 +59,22 @@ export function ImageUpload({ value, onChange, aspect = "video", className, maxM
 
   const effectiveMaxMb = maxMb ?? IMAGE_RULES.maxMb;
   const maxBytes = effectiveMaxMb * 1024 * 1024;
-  const hint = preset
-    ? presetHint(preset)
-    : maxMb
-      ? `PNG, JPG or WEBP up to ${maxMb}MB`
-      : IMAGE_HINT;
+  const hint =
+    preset && !skipDimensions
+      ? presetHint(preset)
+      : maxMb
+        ? `PNG, JPG or WEBP up to ${maxMb}MB`
+        : IMAGE_HINT;
 
   const readFile = async (file: File) => {
-    const invalid = await validateImageFile(file, { maxBytes, maxMb: effectiveMaxMb, preset });
+    const invalid = await validateImageFile(file, { maxBytes, maxMb: effectiveMaxMb, preset, skipDimensions });
     if (invalid) {
       toast.error("Invalid image", invalid);
       return;
     }
     setUploading(true);
     try {
-      const url = await uploadImage(file, { maxKb: Math.round(maxBytes / 1024) });
+      const url = await uploadImage(file, { maxKb: Math.round(maxBytes / 1024), skipDimensions });
       onChange(url);
     } catch (err) {
       toast.error("Upload failed", errorMessage(err));

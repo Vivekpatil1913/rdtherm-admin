@@ -12,7 +12,6 @@ import { TagInput } from "@/components/form/TagInput";
 import { RichTextEditor } from "@/components/form/RichTextEditor";
 import { ImageUpload } from "@/components/form/ImageUpload";
 import { GalleryUpload } from "@/components/form/GalleryUpload";
-import { IMAGE_PRESETS } from "@/lib/image";
 import { useForm } from "@/hooks/useForm";
 import { useCrud } from "@/hooks/useCrud";
 import { productService } from "@/services";
@@ -189,7 +188,7 @@ export function ProductEditor({ product }: ProductEditorProps) {
               </CardTitle>
             </CardHeader>
             <CardBody>
-              <ImageUpload value={form.values.cover} onChange={(url) => form.setValue("cover", url)} aspect="video" preset={IMAGE_PRESETS.productCover} />
+              <ImageUpload value={form.values.cover} onChange={(url) => form.setValue("cover", url)} aspect="video" skipDimensions />
               {form.touched.cover && form.errors.cover ? (
                 <p className="mt-2 text-xs text-[var(--color-danger)]">{form.errors.cover}</p>
               ) : null}
