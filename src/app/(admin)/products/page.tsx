@@ -16,8 +16,13 @@ import { RowActionBar } from "@/components/data-table/RowActionBar";
 import { useResource } from "@/hooks/useResource";
 import { useCrud } from "@/hooks/useCrud";
 import { productService } from "@/services";
-import { truncate } from "@/lib/format";
 import type { Product } from "@/types";
+
+/**
+ * Products that must stay in the catalogue — the website links to them from
+ * fixed navigation/landing pages, so their Delete action is disabled.
+ */
+const UNDELETABLE_SLUGS = new Set(["air-receiver"]);
 
 export default function ProductsPage() {
   const router = useRouter();
@@ -47,7 +52,7 @@ export default function ProductsPage() {
               {row.title}
               {row.featured ? <Star className="size-3.5 fill-[var(--color-warning)] text-[var(--color-warning)]" /> : null}
             </p>
-            <p className="max-w-md truncate text-[12px] text-[var(--color-muted)]">{truncate(row.summary, 80)}</p>
+            <p className="max-w-md truncate text-[12px] text-[var(--color-muted)]">/{row.slug}</p>
           </div>
         </div>
       ),
@@ -98,6 +103,8 @@ export default function ProductsPage() {
               onView={() => router.push(`/products/${row.id}`)}
               onEdit={() => router.push(`/products/${row.id}`)}
               onDelete={() => setDeleting(row)}
+              deleteDisabled={UNDELETABLE_SLUGS.has(row.slug)}
+              deleteDisabledReason="This product cannot be deleted — it has a dedicated page on the website."
               active={row.isActive}
               onToggle={(active) => toggleActive(row, active)}
               toggleEntity="product"

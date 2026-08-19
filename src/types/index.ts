@@ -125,7 +125,6 @@ export interface ProductImage {
 export interface Product extends BaseRecord {
   slug: string;
   title: string;
-  summary: string;
   specs: string[];
   applications: string[];
   materials: string[];

@@ -17,7 +17,22 @@ import { useCrud } from "@/hooks/useCrud";
 import { productService } from "@/services";
 import { rules, type Rule } from "@/lib/validation";
 import { slugify } from "@/lib/format";
+import { IMAGE_PRESETS } from "@/lib/image";
 import type { Product, ProductImage } from "@/types";
+
+/**
+ * Products whose website gallery uses the portrait (tall) layout. Their photos
+ * must be shot vertically, so the editor shows the exact size guide for them.
+ * Keep in sync with PORTRAIT_GALLERY_SLUGS on the website.
+ */
+const PORTRAIT_GALLERY_SLUGS = new Set(["air-receiver"]);
+
+/**
+ * Products whose name is fixed. The website links to them from set navigation
+ * and landing pages, so renaming one (which would change its slug) breaks those
+ * links — the name field is read-only when editing them.
+ */
+const LOCKED_NAME_SLUGS = new Set(["air-receiver"]);
 
 /** Rich-text required check that ignores empty markup like `<p></p>`. */
 const requiredHtml =
@@ -34,7 +49,6 @@ interface ProductEditorProps {
 type FormValues = {
   title: string;
   slug: string;
-  summary: string;
   cover: string;
   images: ProductImage[];
   content: string;
@@ -55,7 +69,6 @@ export function ProductEditor({ product }: ProductEditorProps) {
     initialValues: {
       title: product?.title ?? "",
       slug: product?.slug ?? "",
-      summary: product?.summary ?? "",
       cover: product?.cover ?? "",
       images: product?.images ?? [],
       content: product?.content ?? "",
@@ -69,7 +82,6 @@ export function ProductEditor({ product }: ProductEditorProps) {
     },
     schema: {
       title: [rules.required("Please enter the product name"), rules.maxLength(50)],
-      summary: [rules.required("Please enter the summary"), rules.minLength(20), rules.maxLength(300)],
       specs: [rules.required("Please add at least one key spec")],
       content: [requiredHtml("Please enter the detail content")],
       applications: [rules.required("Please add at least one application")],
@@ -102,6 +114,13 @@ export function ProductEditor({ product }: ProductEditorProps) {
     },
   });
 
+  // Slug decides the website gallery layout, so the size guide follows it —
+  // falling back to the slug that would be generated from the title.
+  const effectiveSlug = form.values.slug || slugify(form.values.title);
+  const isPortraitGallery = PORTRAIT_GALLERY_SLUGS.has(effectiveSlug);
+  // Only locked while editing an existing protected product — never on create.
+  const isNameLocked = !!product && LOCKED_NAME_SLUGS.has(product.slug);
+
   return (
     <form onSubmit={form.handleSubmit}>
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -123,11 +142,25 @@ export function ProductEditor({ product }: ProductEditorProps) {
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
         <div className="flex flex-col gap-5">
           <Card padded className="flex flex-col gap-4">
-            <Field label="Product name" error={form.touched.title ? form.errors.title : ""} required count={form.values.title.length} max={50}>
-              <Input value={form.values.title} onChange={(e) => form.setValue("title", e.target.value)} onBlur={() => form.handleBlur("title")} invalid={!!form.errors.title} maxLength={50} placeholder="Distillation Columns" />
-            </Field>
-            <Field label="Summary" error={form.touched.summary ? form.errors.summary : ""} hint="Shown on the product card and list." required count={form.values.summary.length} max={300}>
-              <Textarea value={form.values.summary} onChange={(e) => form.setValue("summary", e.target.value)} onBlur={() => form.handleBlur("summary")} invalid={!!form.errors.summary} rows={3} maxLength={300} />
+            <Field
+              label="Product name"
+              hint={isNameLocked ? "This name is fixed — the website links to this product from set pages." : undefined}
+              error={form.touched.title ? form.errors.title : ""}
+              required
+              count={form.values.title.length}
+              max={50}
+            >
+              <Input
+                value={form.values.title}
+                onChange={(e) => form.setValue("title", e.target.value)}
+                onBlur={() => form.handleBlur("title")}
+                invalid={!!form.errors.title}
+                maxLength={50}
+                placeholder="Distillation Columns"
+                readOnly={isNameLocked}
+                title={isNameLocked ? "This product's name cannot be changed." : undefined}
+                className={isNameLocked ? "cursor-not-allowed bg-[var(--color-bg-subtle)] text-[var(--color-muted)]" : undefined}
+              />
             </Field>
             <Field label="Key specs" hint="3 short bullet specs shown on the card." error={form.touched.specs ? form.errors.specs : ""} required>
               <TagInput value={form.values.specs} onChange={(v) => form.setValue("specs", v)} placeholder="Shell diameter up to 4,500 mm" />
@@ -188,7 +221,15 @@ export function ProductEditor({ product }: ProductEditorProps) {
               </CardTitle>
             </CardHeader>
             <CardBody>
-              <ImageUpload value={form.values.cover} onChange={(url) => form.setValue("cover", url)} aspect="video" skipDimensions />
+              <ImageUpload
+                value={form.values.cover}
+                onChange={(url) => form.setValue("cover", url)}
+                aspect="video"
+                /* Guidance only — the recommended 4:3 / 400 x 300 size is shown
+                   in the hint, but any dimensions are still accepted. */
+                preset={IMAGE_PRESETS.productCover}
+                skipDimensions
+              />
               {form.touched.cover && form.errors.cover ? (
                 <p className="mt-2 text-xs text-[var(--color-danger)]">{form.errors.cover}</p>
               ) : null}
@@ -204,6 +245,23 @@ export function ProductEditor({ product }: ProductEditorProps) {
           </CardTitle>
         </CardHeader>
         <CardBody>
+          {isPortraitGallery ? (
+            <div className="mb-4 rounded-[10px] border border-[var(--color-border)] bg-[var(--color-brand-soft)]/40 px-4 py-3">
+              <p className="text-[13px] font-semibold text-[var(--color-content)]">
+                Portrait images required — this product’s gallery is a tall (9:16) layout.
+              </p>
+              <dl className="mt-2 flex flex-col gap-1 text-[12px] text-[var(--color-muted)] sm:flex-row sm:gap-6">
+                <div className="flex gap-1.5">
+                  <dt className="font-medium text-[var(--color-content)]">Recommended</dt>
+                  <dd className="tabular-nums">1080 × 1920 px</dd>
+                </div>
+                <div className="flex gap-1.5">
+                  <dt className="font-medium text-[var(--color-content)]">Minimum</dt>
+                  <dd className="tabular-nums">900 × 1600 px</dd>
+                </div>
+              </dl>
+            </div>
+          ) : null}
           <GalleryUpload value={form.values.images} onChange={(imgs) => form.setValue("images", imgs)} />
           {form.touched.images && form.errors.images ? (
             <p className="mt-2 text-xs text-[var(--color-danger)]">{form.errors.images}</p>

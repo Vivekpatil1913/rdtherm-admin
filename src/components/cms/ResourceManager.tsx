@@ -22,6 +22,10 @@ export interface FormRenderProps<V> {
   values: V;
   errors: Record<string, string>;
   setValue: <K extends keyof V>(field: K, value: V[K]) => void;
+  /** Total records in the collection — sequence fields use it as their bound. */
+  total: number;
+  /** False while creating, true while editing an existing record. */
+  isEditing: boolean;
 }
 
 interface ExtraFilter {
@@ -40,6 +44,9 @@ interface ResourceManagerProps<T extends { id: string }, V extends Record<string
   extraFilter?: ExtraFilter;
   /** Always-applied list filters (e.g. pin a logo "kind"). Not shown as a control. */
   baseFilters?: Record<string, string>;
+  /** Opening sort. Defaults to newest-first; sequence-driven modules pass
+      { sortBy: "order", sortDir: "asc" } so the list matches the website. */
+  initialSort?: { sortBy: string; sortDir: "asc" | "desc" };
   /** Form scaffolding for the create/edit modal. */
   emptyValues: V;
   schema?: Schema;
@@ -69,6 +76,7 @@ export function ResourceManager<T extends { id: string }, V extends Record<strin
     searchPlaceholder,
     extraFilter,
     baseFilters,
+    initialSort,
     emptyValues,
     schema,
     toForm,
@@ -78,7 +86,7 @@ export function ResourceManager<T extends { id: string }, V extends Record<strin
     empty,
   } = props;
 
-  const resource = useResource<T>(collection, { initialFilters: baseFilters });
+  const resource = useResource<T>(collection, { initialFilters: baseFilters, initialSort });
   const crud = useCrud<T>(collection, singular);
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -251,7 +259,13 @@ export function ResourceManager<T extends { id: string }, V extends Record<strin
             disabled={viewMode}
             className={`m-0 flex min-w-0 flex-col gap-4 border-0 p-0 ${viewMode ? "pointer-events-none" : ""}`}
           >
-            {renderForm({ values: form.values, errors: form.errors, setValue: form.setValue })}
+            {renderForm({
+              values: form.values,
+              errors: form.errors,
+              setValue: form.setValue,
+              total: resource.total,
+              isEditing: !!editing,
+            })}
           </fieldset>
         </form>
       </Modal>

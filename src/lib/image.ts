@@ -46,7 +46,7 @@ const RATIO_TOLERANCE = 0.03;
  * actually displays the image (so a correctly-sized image always looks right).
  */
 export const IMAGE_PRESETS = {
-  /* Product cover and gallery intentionally have no preset — any dimensions are
+  /* The product gallery intentionally has no preset — any dimensions are
      accepted there, only the 1 MB size cap applies. */
   /** Blog cover — 21:9 wide banner on the article detail page. */
   blogCover: { ratio: { w: 21, h: 9 }, recW: 1680, recH: 720, minW: 1260, minH: 540 },
@@ -58,6 +58,8 @@ export const IMAGE_PRESETS = {
   industryCover: { ratio: { w: 5, h: 4 }, recW: 1000, recH: 800, minW: 600, minH: 480 },
   /** Team / director photo — 4:5 portrait. */
   teamPhoto: { ratio: { w: 4, h: 5 }, recW: 800, recH: 1000, minW: 480, minH: 600 },
+  /** Product cover — 4:3 card image on the website product grids. */
+  productCover: { ratio: { w: 4, h: 3 }, recW: 400, recH: 300, minW: 400, minH: 300 },
   /** Square avatar — testimonials, profile photo. */
   avatar: { ratio: { w: 1, h: 1 }, recW: 600, recH: 600, minW: 300, minH: 300 },
 } as const satisfies Record<string, ImagePreset>;

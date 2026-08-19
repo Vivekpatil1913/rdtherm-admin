@@ -10,6 +10,10 @@ interface RowActionBarProps {
   onView?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
+  /** Render Delete greyed out and inert — for rows that must not be removed. */
+  deleteDisabled?: boolean;
+  /** Tooltip explaining why Delete is disabled. */
+  deleteDisabledReason?: string;
   /** Active/inactive toggle — pass both to render it. */
   active?: boolean;
   onToggle?: (active: boolean) => void;
@@ -22,7 +26,16 @@ interface RowActionBarProps {
  * The toggle opens a confirmation dialog before activating/deactivating.
  * Each control is optional — only the ones whose handlers are provided render.
  */
-export function RowActionBar({ onView, onEdit, onDelete, active, onToggle, toggleEntity = "item" }: RowActionBarProps) {
+export function RowActionBar({
+  onView,
+  onEdit,
+  onDelete,
+  deleteDisabled,
+  deleteDisabledReason,
+  active,
+  onToggle,
+  toggleEntity = "item",
+}: RowActionBarProps) {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const willActivate = !active;
 
@@ -39,7 +52,12 @@ export function RowActionBar({ onView, onEdit, onDelete, active, onToggle, toggl
         </IconButton>
       ) : null}
       {onDelete ? (
-        <IconButton label="Delete" onClick={onDelete} className="text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)]">
+        <IconButton
+          label={deleteDisabled ? deleteDisabledReason ?? "Delete is not allowed" : "Delete"}
+          onClick={onDelete}
+          disabled={deleteDisabled}
+          className="text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)]"
+        >
           <Trash2 className="size-[18px]" />
         </IconButton>
       ) : null}
@@ -77,11 +95,13 @@ export function RowActionBar({ onView, onEdit, onDelete, active, onToggle, toggl
 function IconButton({
   label,
   onClick,
+  disabled,
   className,
   children,
 }: {
   label: string;
   onClick: () => void;
+  disabled?: boolean;
   className?: string;
   children: React.ReactNode;
 }) {
@@ -89,11 +109,14 @@ function IconButton({
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       title={label}
       aria-label={label}
       className={cn(
         "inline-flex size-8 items-center justify-center rounded-md transition-colors",
-        className,
+        disabled
+          ? "cursor-not-allowed text-[var(--color-muted)] opacity-50"
+          : className,
       )}
     >
       {children}

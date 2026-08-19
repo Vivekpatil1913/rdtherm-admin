@@ -76,6 +76,18 @@ export const rules = {
     (field: string, message = "Values do not match"): Rule =>
     (value, all) =>
       value !== all[field] ? message : null,
+  /**
+   * Whole number ≥ 1 — display positions, quantities, anything 1-based.
+   * Blank passes: pair with `required` when the field is mandatory.
+   */
+  positiveInt:
+    (message = "Enter a whole number starting from 1"): Rule =>
+    (value) => {
+      if (value === null || value === undefined || value === "") return null;
+      const num = Number(value);
+      if (!Number.isFinite(num) || !Number.isInteger(num) || num < 1) return message;
+      return null;
+    },
 };
 
 export function validate(values: Record<string, unknown>, schema: Schema): Errors {

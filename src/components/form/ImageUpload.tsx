@@ -16,7 +16,9 @@ interface ImageUploadProps {
   className?: string;
   /** Optional max file size in MB (defaults to the global 2MB rule). */
   maxMb?: number;
-  /** Required dimensions (aspect ratio + recommended size) for this field. */
+  /** Recommended dimensions (aspect ratio + size) shown in the field hint.
+   *  Combined with `skipDimensions` it is guidance only; on its own it is also
+   *  enforced on upload. */
   preset?: ImagePreset;
   /** Accept any image dimensions — only the file type and size cap are enforced. */
   skipDimensions?: boolean;
@@ -60,7 +62,7 @@ export function ImageUpload({ value, onChange, aspect = "video", className, maxM
   const effectiveMaxMb = maxMb ?? IMAGE_RULES.maxMb;
   const maxBytes = effectiveMaxMb * 1024 * 1024;
   const hint =
-    preset && !skipDimensions
+    preset
       ? presetHint(preset)
       : maxMb
         ? `PNG, JPG or WEBP up to ${maxMb}MB`
