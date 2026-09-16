@@ -3,7 +3,8 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 
 const SITE_KEY =
-  process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "6Le8QjEtAAAAAC26DAKyEYMmIwLCK06dcWGhTDM7";
+  // process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "6Le8QjEtAAAAAC26DAKyEYMmIwLCK06dcWGhTDM7";
+  process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "6Ld0xaEtAAAAALFCfhNAhlycNz81ALCtjBoZ7VhQ";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 declare global {

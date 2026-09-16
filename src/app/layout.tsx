@@ -17,6 +17,9 @@ export const metadata: Metadata = {
   },
   description: "Content management system for the R&D Therm website.",
   robots: { index: false, follow: false },
+  // Favicons come from the file convention in src/app/: favicon.ico (legacy),
+  // icon.svg / icon.png (browser tabs) and apple-icon.png (iOS home screen).
+  appleWebApp: { title: "R&D Therm CMS" },
 };
 
 export const viewport: Viewport = {

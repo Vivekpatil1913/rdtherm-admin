@@ -60,14 +60,18 @@ export default function ProductsPage() {
     {
       key: "compliance",
       header: "Compliance",
-      render: (row) => (
-        <div className="flex flex-wrap gap-1">
-          {row.compliance.slice(0, 2).map((c) => (
-            <Badge key={c} tone="neutral">{c}</Badge>
-          ))}
-          {row.compliance.length > 2 ? <Badge tone="neutral">+{row.compliance.length - 2}</Badge> : null}
-        </div>
-      ),
+      // Compliance is optional — show a dash rather than an empty cell.
+      render: (row) =>
+        row.compliance?.length ? (
+          <div className="flex flex-wrap gap-1">
+            {row.compliance.slice(0, 2).map((c) => (
+              <Badge key={c} tone="neutral">{c}</Badge>
+            ))}
+            {row.compliance.length > 2 ? <Badge tone="neutral">+{row.compliance.length - 2}</Badge> : null}
+          </div>
+        ) : (
+          <span className="text-[13px] text-[var(--color-muted)]">—</span>
+        ),
     },
   ];
 

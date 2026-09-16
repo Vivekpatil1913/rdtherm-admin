@@ -84,11 +84,6 @@ export function ProductEditor({ product }: ProductEditorProps) {
       title: [rules.required("Please enter the product name"), rules.maxLength(50)],
       specs: [rules.required("Please add at least one key spec")],
       content: [requiredHtml("Please enter the detail content")],
-      applications: [rules.required("Please add at least one application")],
-      materials: [rules.required("Please add at least one material")],
-      compliance: [rules.required("Please add at least one compliance code")],
-      benefits: [rules.required("Please add at least one benefit")],
-      inclusions: [rules.required("Please add at least one inclusion")],
       cover: [rules.required("Please upload a cover image")],
       images: [rules.required("Please add gallery images")],
     },
@@ -180,19 +175,19 @@ export function ProductEditor({ product }: ProductEditorProps) {
           </Card>
 
           <Card padded className="flex flex-col gap-4">
-            <Field label="Applications" error={form.touched.applications ? form.errors.applications : ""} required>
+            <Field label="Applications" error={form.touched.applications ? form.errors.applications : ""} optional>
               <TagInput value={form.values.applications} onChange={(v) => form.setValue("applications", v)} placeholder="Chemical processing" />
             </Field>
-            <Field label="Materials" error={form.touched.materials ? form.errors.materials : ""} required>
+            <Field label="Materials" error={form.touched.materials ? form.errors.materials : ""} optional>
               <TagInput value={form.values.materials} onChange={(v) => form.setValue("materials", v)} placeholder="Stainless Steel" />
             </Field>
-            <Field label="Compliance / Codes" error={form.touched.compliance ? form.errors.compliance : ""} required>
+            <Field label="Compliance / Codes" error={form.touched.compliance ? form.errors.compliance : ""} optional>
               <TagInput value={form.values.compliance} onChange={(v) => form.setValue("compliance", v)} placeholder="ASME U-Stamp" />
             </Field>
-            <Field label="Benefits" error={form.touched.benefits ? form.errors.benefits : ""} required>
+            <Field label="Benefits" error={form.touched.benefits ? form.errors.benefits : ""} optional>
               <TagInput value={form.values.benefits} onChange={(v) => form.setValue("benefits", v)} placeholder="High separation efficiency" />
             </Field>
-            <Field label="Always included" hint="Engineering services shipped with every unit." error={form.touched.inclusions ? form.errors.inclusions : ""} required>
+            <Field label="Always included" hint="Engineering services shipped with every unit." error={form.touched.inclusions ? form.errors.inclusions : ""} optional>
               <TagInput value={form.values.inclusions} onChange={(v) => form.setValue("inclusions", v)} placeholder="Third-party inspection and code stamping." />
             </Field>
           </Card>

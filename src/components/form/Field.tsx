@@ -6,6 +6,8 @@ interface FieldProps {
   error?: string;
   hint?: string;
   required?: boolean;
+  /** Renders a muted "(optional)" beside the label — for fields safe to leave blank. */
+  optional?: boolean;
   /** Current value length — renders a live "count/max" counter in the footer. */
   count?: number;
   /** Max length for the counter (and the danger colour once reached). */
@@ -14,7 +16,7 @@ interface FieldProps {
   children: React.ReactNode;
 }
 
-export function Field({ label, htmlFor, error, hint, required, count, max, className, children }: FieldProps) {
+export function Field({ label, htmlFor, error, hint, required, optional, count, max, className, children }: FieldProps) {
   const showCount = typeof count === "number" && typeof max === "number";
   const showFooter = !!error || !!hint || showCount;
   return (
@@ -23,6 +25,9 @@ export function Field({ label, htmlFor, error, hint, required, count, max, class
         <label htmlFor={htmlFor} className="text-[13px] font-medium text-[var(--color-content)]">
           {label}
           {required ? <span className="ml-0.5 text-[var(--color-danger)]">*</span> : null}
+          {optional ? (
+            <span className="ml-1.5 text-[12px] font-normal text-[var(--color-muted)]">(optional)</span>
+          ) : null}
         </label>
       ) : null}
       {children}
