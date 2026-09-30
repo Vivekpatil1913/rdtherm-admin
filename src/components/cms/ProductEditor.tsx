@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { ArrowLeft, Save } from "lucide-react";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -109,9 +110,23 @@ export function ProductEditor({ product }: ProductEditorProps) {
     },
   });
 
-  // Slug decides the website gallery layout, so the size guide follows it —
-  // falling back to the slug that would be generated from the title.
+  // The URL slug tracks the product name until someone edits it by hand. An
+  // existing product already has a slug, so it starts detached: regenerating it
+  // would change a live URL, which is the editor's call via "Use name".
+  const [slugEdited, setSlugEdited] = useState(!!product?.slug);
+
+  /** Product name and slug move together while the slug is still auto-derived. */
+  const setTitle = (value: string) => {
+    form.setValue("title", value);
+    if (!slugEdited) form.setValue("slug", slugify(value));
+  };
+
+  // The slug also decides the website gallery layout, so the size guide follows
+  // it, falling back to the slug that would be generated from the title.
   const effectiveSlug = form.values.slug || slugify(form.values.title);
+  // A slug left over from a previous name is what makes a catalogue link open
+  // the wrong product page. Surface the drift instead of hiding it.
+  const slugMismatch = !!product && effectiveSlug !== slugify(form.values.title);
   const isPortraitGallery = PORTRAIT_GALLERY_SLUGS.has(effectiveSlug);
   // Only locked while editing an existing protected product — never on create.
   const isNameLocked = !!product && LOCKED_NAME_SLUGS.has(product.slug);
@@ -147,7 +162,7 @@ export function ProductEditor({ product }: ProductEditorProps) {
             >
               <Input
                 value={form.values.title}
-                onChange={(e) => form.setValue("title", e.target.value)}
+                onChange={(e) => setTitle(e.target.value)}
                 onBlur={() => form.handleBlur("title")}
                 invalid={!!form.errors.title}
                 maxLength={50}
@@ -156,6 +171,44 @@ export function ProductEditor({ product }: ProductEditorProps) {
                 title={isNameLocked ? "This product's name cannot be changed." : undefined}
                 className={isNameLocked ? "cursor-not-allowed bg-[var(--color-bg-subtle)] text-[var(--color-muted)]" : undefined}
               />
+            </Field>
+            <Field
+              label="URL slug"
+              hint={`Live page: /products/${effectiveSlug || "..."}`}
+              error={
+                slugMismatch
+                  ? `This slug no longer matches the product name, so the catalogue link opens /products/${effectiveSlug}.`
+                  : ""
+              }
+            >
+              <div className="flex items-center gap-2">
+                <Input
+                  value={form.values.slug}
+                  onChange={(e) => {
+                    setSlugEdited(true);
+                    form.setValue("slug", e.target.value);
+                  }}
+                  onBlur={(e) => form.setValue("slug", slugify(e.target.value))}
+                  invalid={slugMismatch}
+                  maxLength={190}
+                  placeholder={slugify(form.values.title) || "distillation-columns"}
+                  readOnly={isNameLocked}
+                  className={isNameLocked ? "cursor-not-allowed bg-[var(--color-bg-subtle)] text-[var(--color-muted)]" : undefined}
+                />
+                {!isNameLocked ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => {
+                      setSlugEdited(false);
+                      form.setValue("slug", slugify(form.values.title));
+                    }}
+                    disabled={!form.values.title || form.values.slug === slugify(form.values.title)}
+                  >
+                    Use name
+                  </Button>
+                ) : null}
+              </div>
             </Field>
             <Field label="Key specs" hint="3 short bullet specs shown on the card." error={form.touched.specs ? form.errors.specs : ""} required>
               <TagInput value={form.values.specs} onChange={(v) => form.setValue("specs", v)} placeholder="Shell diameter up to 4,500 mm" />

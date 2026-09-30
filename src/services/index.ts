@@ -13,6 +13,7 @@ import type {
   AdminUser,
   BlogPost,
   CaseStudy,
+  SeoPage,
   Faq,
   Industry,
   JobOpening,
@@ -33,6 +34,7 @@ export const logoService = apiCollection<Logo>("/logos");
 export const faqService = apiCollection<Faq>("/faqs");
 export const teamService = apiCollection<TeamMember>("/team");
 export const caseStudyService = apiCollection<CaseStudy>("/case-studies");
+export const seoPageService = apiCollection<SeoPage>("/seo-pages");
 export const industryService = apiCollection<Industry>("/industries");
 export const openingService = apiCollection<JobOpening>("/careers");
 export const leadService = apiCollection<Lead>("/leads");

@@ -60,6 +60,50 @@ export interface Logo extends BaseRecord {
   name: string;
   imageUrl?: string;
   kind: LogoKind;
+  /** Linked case study id, or null when the logo is a trust mark only. */
+  caseStudyId?: string | null;
+  /** Resolved case study title and slug, returned by the API for display only. */
+  caseStudyTitle?: string | null;
+  caseStudySlug?: string | null;
+}
+
+/* ------------------------- SEO landing pages --------------------------- */
+
+/** One body section of a landing page. */
+export interface SeoSection {
+  heading: string;
+  body: string;
+  bullets: string[];
+}
+
+export interface SeoFaq {
+  question: string;
+  answer: string;
+}
+
+/**
+ * A service + location (or capability) landing page. Everything the website
+ * renders comes from here, so new pages need no code change.
+ */
+export interface SeoPage extends BaseRecord {
+  slug: string;
+  name: string;
+  primaryKeyword: string;
+  seoTitle: string;
+  metaDescription: string;
+  h1: string;
+  heroDescription: string;
+  heroImageUrl?: string;
+  heroImageAlt?: string;
+  sections: SeoSection[];
+  industryKeys: string[];
+  productSlugs: string[];
+  caseStudySlugs: string[];
+  faqs: SeoFaq[];
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImageUrl?: string;
+  canonicalUrl?: string;
 }
 
 /* -------------------------------- FAQ ---------------------------------- */
@@ -67,6 +111,10 @@ export interface Logo extends BaseRecord {
 export interface Faq extends BaseRecord {
   question: string;
   answer: string;
+  /** Owning product id, or null for a FAQ shown on every product page. */
+  productId?: string | null;
+  /** Resolved product name, returned by the API for display only. */
+  productTitle?: string | null;
 }
 
 /* ------------------------------- Blogs --------------------------------- */

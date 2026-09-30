@@ -13,6 +13,7 @@ import {
   Inbox,
   FileText,
   ClipboardList,
+  Search,
   Settings,
 } from "lucide-react";
 
@@ -52,6 +53,7 @@ export const navGroups: NavGroup[] = [
       { label: "Blogs / Articles", href: "/blogs", icon: Newspaper },
       { label: "Case Studies", href: "/case-studies", icon: Trophy },
       { label: "FAQs", href: "/faqs", icon: HelpCircle },
+      { label: "SEO Landing Pages", href: "/seo-pages", icon: Search },
     ],
   },
   {

@@ -64,6 +64,8 @@ export function GalleryUpload({ value, onChange }: GalleryUploadProps) {
     }
   };
 
+  const missingAlt = value.filter((img) => !img.alt.trim()).length;
+
   const removeAt = (i: number) => onChange(value.filter((_, idx) => idx !== i));
   const setAlt = (i: number, alt: string) =>
     onChange(value.map((img, idx) => (idx === i ? { ...img, alt } : img)));
@@ -90,8 +92,12 @@ export function GalleryUpload({ value, onChange }: GalleryUploadProps) {
             <Input
               value={img.alt}
               onChange={(e) => setAlt(i, e.target.value)}
-              placeholder="Image name (shown on hover)"
-              className="text-[12px]"
+              placeholder="Describe this photo"
+              aria-label={`Alt text for image ${i + 1}`}
+              className={cn(
+                "text-[12px]",
+                !img.alt.trim() && "border-[var(--color-warning,#d97706)]",
+              )}
             />
           </div>
         ))}
@@ -116,6 +122,15 @@ export function GalleryUpload({ value, onChange }: GalleryUploadProps) {
           </button>
         ) : null}
       </div>
+
+      {missingAlt > 0 ? (
+        <p className="text-[12px] text-[var(--color-warning,#d97706)]">
+          {missingAlt === 1
+            ? "1 image has no description."
+            : `${missingAlt} images have no description.`}{" "}
+          Screen readers and Google read this text — without it the photo is invisible to both.
+        </p>
+      ) : null}
 
       <div className="flex items-center justify-between text-[12px] text-[var(--color-muted)]">
         <span>{`Up to ${maxImages} images · Max: ${maxMb} MB each`}</span>
